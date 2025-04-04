@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { products } from "@/app/schema/schema";
+import { sql } from "drizzle-orm";
 
 const db = drizzle(
   createClient({
@@ -11,38 +12,35 @@ const db = drizzle(
   })
 );
 
-// 🔹 Obtener productos (todos o uno por ID)
+// 🔹 Obtener productos
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get("id");
 
     if (productId) {
-      const product = await db
+      const result = await db
         .select()
         .from(products)
-        .where(eq(products.id, Number(productId)))
-        .limit(1);
+        .where(eq(products.id, sql.placeholder('id')))
+        .prepare()
+        .execute({ id: Number(productId) });
 
-      if (product.length === 0) {
+      if (result.rows.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
       }
 
+      const product = result.rows[0] as typeof products.$inferSelect;
       return NextResponse.json({
-        ...product[0],
-        images: typeof product[0].images === "string" 
-          ? JSON.parse(product[0].images)
-          : product[0].images || []
+        ...product,
+        images: typeof product.images === "string" ? JSON.parse(product.images) : product.images
       });
     }
 
-    // Obtener todos los productos
     const allProducts = await db.select().from(products);
-    const formattedProducts = allProducts.map((product) => ({
+    const formattedProducts = allProducts.map(product => ({
       ...product,
-      images: typeof product.images === "string" 
-        ? JSON.parse(product.images)
-        : product.images || []
+      images: typeof product.images === "string" ? JSON.parse(product.images) : product.images
     }));
 
     return NextResponse.json(formattedProducts);
@@ -52,57 +50,49 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// 🔹 Agregar un nuevo producto (POST)
+// 🔹 Crear nuevo producto
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      title,
-      description,
-      price,
-      compareAtPrice,
-      costPerItem,
-      vendor,
-      productType,
-      status,
-      category,
-      tags,
-      sku,
-      barcode,
-      quantity,
-      trackInventory,
-      images,
-    } = body;
-
-    if (!title || !price || !images || !Array.isArray(images) || images.length === 0) {
+    
+    // Validación de campos requeridos
+    if (!body.title || !body.price || !body.images || !Array.isArray(body.images)) {
       return NextResponse.json(
-        { error: "Se requieren título, precio y al menos una imagen" },
+        { error: "Título, precio e imágenes son requeridos" },
         { status: 400 }
       );
     }
 
-    await db.insert(products).values({
-      title,
-      description: description || "",
-      price: Number(price),
-      compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
-      costPerItem: costPerItem ? Number(costPerItem) : null,
-      vendor: vendor || "",
-      productType: productType || "physical",
-      status: Boolean(status),
-      category: category || "",
-      tags: tags || "",
-      sku: sku || "",
-      barcode: barcode || "",
-      quantity: quantity ? Number(quantity) : 0,
-      trackInventory: Boolean(trackInventory),
-      images: JSON.stringify(images),
-    });
+    // Construir objeto de inserción con tipos correctos
+    const insertData: typeof products.$inferInsert = {
+      title: body.title,
+      description: body.description || null,
+      price: Number(body.price),
+      compareAtPrice: body.compareAtPrice ? Number(body.compareAtPrice) : null,
+      costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
+      vendor: body.vendor || null,
+      productType: body.productType || 'physical',
+      status: Boolean(body.status),
+      category: body.category || null,
+      tags: body.tags || null,
+      sku: body.sku || null,
+      barcode: body.barcode || null,
+      quantity: body.quantity ? Number(body.quantity) : 0,
+      trackInventory: Boolean(body.trackInventory),
+      images: JSON.stringify(body.images),
+    };
 
-    return NextResponse.json(
-      { message: "Producto creado exitosamente" }, 
-      { status: 201 }
-    );
+    // Ejecutar inserción
+    const result = await db.insert(products).values(insertData).returning();
+
+    return NextResponse.json({
+      message: "Producto creado exitosamente",
+      data: {
+        ...result[0],
+        images: typeof result[0].images === "string" ? JSON.parse(result[0].images) : result[0].images
+      }
+    }, { status: 201 });
+
   } catch (error) {
     console.error("Error al guardar el producto:", error);
     return NextResponse.json(
