@@ -2,16 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/productcard/page";
 import { getProducts } from "@/app/api/action/route";
-
-// Definir la interfaz para el tipo Product
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  description?: string;
-  images?: string[];
-  // Agrega otras propiedades necesarias según tu API
-}
+import { Product } from "@/types/product";
 
 export default async function ProductsPage() {
   const products = await getProducts() as Product[];
@@ -34,7 +25,7 @@ export default async function ProductsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product: Product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
