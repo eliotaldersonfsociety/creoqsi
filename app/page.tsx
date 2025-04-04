@@ -86,8 +86,6 @@ export default function NewProduct() {
       return
     }
 
-    console.log("Enviando datos a la API:", { title: product.title, category: product.category })
-
     setGenerating(true)
 
     try {
@@ -97,19 +95,16 @@ export default function NewProduct() {
         body: JSON.stringify({ title: product.title, category: product.category }),
       })
 
-      console.log("Respuesta de la API:", res)
-
       if (!res.ok) {
         const errorText = await res.text()
         throw new Error(`Error en la respuesta del servidor: ${res.status} - ${errorText}`)
       }
 
       const data = await res.json()
-      console.log("Descripción generada:", data)
-
       setProduct((prev) => ({ ...prev, description: data.description }))
     } catch (error) {
-      console.error("Error generando la descripción:", error.message)
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      console.error("Error generando la descripción:", errorMessage)
       alert("Hubo un problema al generar la descripción.")
     } finally {
       setGenerating(false)
@@ -117,7 +112,7 @@ export default function NewProduct() {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target as HTMLInputElement
     setProduct({ ...product, [name]: type === "checkbox" ? checked : value })
   }
 
@@ -146,7 +141,8 @@ export default function NewProduct() {
         alert("Error al subir la imagen")
       }
     } catch (error) {
-      console.error(error)
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      console.error("Error en la subida de imagen:", errorMessage)
       alert("Error en la subida de imagen")
     } finally {
       setUploading(false)
@@ -183,19 +179,20 @@ export default function NewProduct() {
       const data = await res.json()
       setProduct((prev) => ({
         ...prev,
-        images: [...prev.images, ...data.images.slice(0, 4)], // Limita a 4 imágenes nuevas
+        images: [...prev.images, ...data.images.slice(0, 4)],
       }))
     } catch (error) {
-      console.error("Error generando imágenes:", error)
-      alert(error instanceof Error ? error.message : "Error desconocido")
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      console.error("Error generando imágenes:", errorMessage)
+      alert(errorMessage)
     } finally {
       setGeneratingImage(false)
     }
   }
 
   const handleSizeRangeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const parsedValue = Number.parseInt(value, 10);
+    const { name, value } = e.target
+    const parsedValue = Number.parseInt(value, 10)
     if (!isNaN(parsedValue)) {
       setProduct((prev) => ({
         ...prev,
@@ -203,63 +200,60 @@ export default function NewProduct() {
           ...prev.sizeRange,
           [name]: parsedValue,
         },
-      }));
+      }))
     }
-  };
-  
+  }
+
   const handleColorToggle = (color: string) => {
     setProduct((prev) => {
       if (prev.colors.includes(color)) {
-        return { ...prev, colors: prev.colors.filter((c) => c !== color) };
+        return { ...prev, colors: prev.colors.filter((c) => c !== color) }
       } else {
-        return { ...prev, colors: [...prev.colors, color] };
+        return { ...prev, colors: [...prev.colors, color] }
       }
-    });
-  };
-  
+    })
+  }
+
   const handleSizeToggle = (size: string) => {
     setProduct((prev) => {
       if (prev.sizes.includes(size)) {
-        return { ...prev, sizes: prev.sizes.filter((s) => s !== size) };
+        return { ...prev, sizes: prev.sizes.filter((s) => s !== size) }
       } else {
-        return { ...prev, sizes: [...prev.sizes, size] };
+        return { ...prev, sizes: [...prev.sizes, size] }
       }
-    });
-  };
-  
+    })
+  }
+
   const handleSubmit = async () => {
     try {
-      // Preparar datos para la API
       const payload = {
         ...product,
-        sizes: product.sizes, // Ya es un array
-        colors: product.colors, // Ya es un array
-        sizeRange: product.sizeRange, // Es un objeto
-        tags: product.tags.split(',').map(tag => tag.trim()), // Convertir string a array
-      };
-  
-      console.log("Datos a enviar:", payload); // Agregar este log para verificar los datos
-  
+        sizes: product.sizes,
+        colors: product.colors,
+        sizeRange: product.sizeRange,
+        tags: product.tags.split(',').map(tag => tag.trim()),
+      }
+
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
-  
+      })
+
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Error en la respuesta del servidor: ${res.status} - ${errorText}`);
+        const errorText = await res.text()
+        throw new Error(`Error en la respuesta del servidor: ${res.status} - ${errorText}`)
       }
-  
-      const data = await res.json();
-      console.log("Producto guardado exitosamente:", data);
-      alert("Producto guardado exitosamente");
+
+      const data = await res.json()
+      console.log("Producto guardado exitosamente:", data)
+      alert("Producto guardado exitosamente")
     } catch (error) {
-      console.error(error);
-      alert("Error al guardar el producto");
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      console.error("Error al guardar el producto:", errorMessage)
+      alert(errorMessage)
     }
-  };
-  
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -520,7 +514,6 @@ export default function NewProduct() {
                     <CardDescription>Define las tallas y colores disponibles para este producto.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Tallas estándar */}
                     <div className="space-y-3">
                       <Label className="text-base font-medium">Tallas Estándar</Label>
                       <div className="flex flex-wrap gap-2">
@@ -538,7 +531,6 @@ export default function NewProduct() {
                       </div>
                     </div>
 
-                    {/* Rango de tallas numéricas */}
                     <div className="space-y-3">
                       <Label className="text-base font-medium">Rango de Tallas (cm)</Label>
                       <div className="grid grid-cols-2 gap-4">
@@ -572,7 +564,6 @@ export default function NewProduct() {
                       </p>
                     </div>
 
-                    {/* Colores */}
                     <div className="space-y-3">
                       <Label className="text-base font-medium">Colores Disponibles</Label>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -741,4 +732,3 @@ export default function NewProduct() {
     </div>
   )
 }
-
