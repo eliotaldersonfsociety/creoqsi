@@ -24,7 +24,7 @@ interface ProductFormProps {
     costPerItem?: number
     vendor?: string
     productType?: string
-    status?: number // Corregido a número
+    status?: number
     category?: string
     tags?: string
     sku?: string
@@ -73,7 +73,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     costPerItem: initialData?.costPerItem?.toString() || "",
     vendor: initialData?.vendor || "",
     productType: initialData?.productType || "",
-    status: initialData?.status ?? 0, // Valor numérico
+    status: initialData?.status ?? 0,
     category: initialData?.category || "",
     tags: initialData?.tags || "",
     sku: initialData?.sku || "",
@@ -121,10 +121,10 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     if (file) {
       const reader = new FileReader()
       reader.onload = (event) => {
-        if (event.target?.result) {
+        if (event.target?.result && typeof event.target.result === "string") {
           setFormData((prev) => ({
             ...prev,
-            images: [...prev.images, event.target.result as string],
+            images: [...prev.images, event.target.result],
           }))
         }
       }
@@ -153,7 +153,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
         price: Number.parseFloat(formData.price),
         compareAtPrice: formData.compareAtPrice ? Number.parseFloat(formData.compareAtPrice) : null,
         costPerItem: formData.costPerItem ? Number.parseFloat(formData.costPerItem) : null,
-        quantity: formData.quantity ? Number.parseInt(formData.quantity) : null,
+        quantity: formData.quantity ? Number.parseInt(formData.quantity) : 0,
       }
 
       const sizes = formData.sizes
