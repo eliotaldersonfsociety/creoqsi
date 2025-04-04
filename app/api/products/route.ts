@@ -93,8 +93,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    console.log("Datos recibidos:", body); // Agregar este log para verificar los datos recibidos
-
     // Validación de campos requeridos
     const requiredFields = ["title", "price", "images"];
     const missingFields = requiredFields.filter((field) => !body[field]);
@@ -109,28 +107,6 @@ export async function POST(req: NextRequest) {
     // Convertir status a número
     const status = typeof body.status === "string" ? body.status.toLowerCase() : "draft";
     const numericStatus = status in statusMap ? statusMap[status as StatusKey] : statusMap.draft;
-
-    // Verificar los valores antes de la inserción
-    console.log("Valores a insertar:", {
-      title: body.title,
-      description: body.description || null,
-      price: Number(body.price),
-      compareAtPrice: body.compareAtPrice ? Number(body.compareAtPrice) : null,
-      costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
-      vendor: body.vendor || null,
-      productType: body.productType || null,
-      status: numericStatus,
-      category: body.category || null,
-      tags: body.tags ? JSON.stringify(body.tags) : "[]",
-      sku: body.sku || null,
-      barcode: body.barcode || null,
-      quantity: body.quantity ? Number(body.quantity) : 0,
-      trackInventory: Boolean(body.trackInventory),
-      images: JSON.stringify(body.images),
-      sizes: body.sizes ? JSON.stringify(body.sizes) : "[]",
-      sizeRange: body.sizeRange ? JSON.stringify(body.sizeRange) : JSON.stringify({ min: 18, max: 45 }),
-      colors: body.colors ? JSON.stringify(body.colors) : "[]",
-    });
 
     // Insertar en la base de datos
     const result = await db
@@ -149,7 +125,7 @@ export async function POST(req: NextRequest) {
         sku: body.sku || null,
         barcode: body.barcode || null,
         quantity: body.quantity ? Number(body.quantity) : 0,
-        trackInventory: Boolean(body.trackInventory),
+        trackInventory: body.trackInventory ? 1 : 0, // Corregido aquí
         images: JSON.stringify(body.images),
         sizes: body.sizes ? JSON.stringify(body.sizes) : "[]",
         sizeRange: body.sizeRange ? JSON.stringify(body.sizeRange) : JSON.stringify({ min: 18, max: 45 }),
@@ -164,7 +140,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// 🔹 Actualizar producto (PUT)
 // 🔹 Actualizar producto (PUT)
 export async function PUT(req: NextRequest) {
   try {
@@ -202,13 +177,13 @@ export async function PUT(req: NextRequest) {
     if (body.sku !== undefined) updateData.sku = body.sku;
     if (body.barcode !== undefined) updateData.barcode = body.barcode;
     if (body.quantity !== undefined) updateData.quantity = Number(body.quantity);
-    if (body.trackInventory !== undefined) updateData.trackInventory = Boolean(body.trackInventory);
+    if (body.trackInventory !== undefined) updateData.trackInventory = body.trackInventory ? 1 : 0; // Corregido aquí
     if (body.images !== undefined) updateData.images = JSON.stringify(body.images);
     if (body.sizes !== undefined) updateData.sizes = JSON.stringify(body.sizes);
     if (body.sizeRange !== undefined) updateData.sizeRange = JSON.stringify(body.sizeRange);
     if (body.colors !== undefined) updateData.colors = JSON.stringify(body.colors);
 
-    // Verificar que hay al menos un campo a actualizar
+    // Verificar campos a actualizar
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: "No se proporcionaron campos para actualizar" }, { status: 400 });
     }
