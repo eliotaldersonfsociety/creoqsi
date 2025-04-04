@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
-import { Product } from "@/types"
+import { Product } from "@/types/product"
 
 const customLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
   return `${src}?w=${width}&q=${quality || 75}`
