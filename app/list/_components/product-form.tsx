@@ -26,7 +26,7 @@ interface ProductFormProps {
     productType?: string
     status?: number
     category?: string
-    tags?: string
+    tags?: string[]
     sku?: string
     barcode?: string
     quantity?: number
@@ -40,7 +40,6 @@ interface ProductFormProps {
 }
 
 interface FormData {
-  [key: string]: any
   title: string
   description: string
   price: string
@@ -64,7 +63,7 @@ interface FormData {
 export default function ProductForm({ initialData, id }: ProductFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  
+
   const initialFormData: FormData = {
     title: initialData?.title || "",
     description: initialData?.description || "",
@@ -75,15 +74,15 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     productType: initialData?.productType || "",
     status: initialData?.status ?? 0,
     category: initialData?.category || "",
-    tags: initialData?.tags || "",
+    tags: initialData?.tags?.join(", ") || "",
     sku: initialData?.sku || "",
     barcode: initialData?.barcode || "",
     quantity: initialData?.quantity?.toString() || "",
     trackInventory: initialData?.trackInventory || false,
     images: initialData?.images || [],
-    sizes: Array.isArray(initialData?.sizes) ? initialData?.sizes.join(", ") : "",
+    sizes: initialData?.sizes?.join(", ") || "",
     sizeRange: initialData?.sizeRange || { min: 18, max: 45 },
-    colors: Array.isArray(initialData?.colors) ? initialData?.colors.join(", ") : "",
+    colors: initialData?.colors?.join(", ") || "",
   }
 
   const [formData, setFormData] = useState<FormData>(initialFormData)
@@ -94,20 +93,20 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
   const handleSwitchChange = (name: string, checked: boolean) => {
-    setFormData((prev) => ({ ...prev, [name]: checked }))
+    setFormData(prev => ({ ...prev, [name]: checked }))
   }
 
   const handleSizeRangeChange = (field: "min" | "max", value: string) => {
     const numValue = Number.parseInt(value) || 0
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       sizeRange: {
         ...prev.sizeRange,
@@ -122,9 +121,9 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
       const reader = new FileReader()
       reader.onload = (event) => {
         if (event.target?.result && typeof event.target.result === "string") {
-          setFormData((prev) => ({
+          setFormData(prev => ({
             ...prev,
-            images: [...prev.images, event.target.result],
+            images: [...prev.images, event.target.result as string]
           }))
         }
       }
@@ -133,7 +132,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
   }
 
   const handleRemoveImage = (index: number) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }))
@@ -158,11 +157,15 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
 
       const sizes = formData.sizes
         .split(",")
-        .map((size) => size.trim())
+        .map(size => size.trim())
         .filter(Boolean)
       const colors = formData.colors
         .split(",")
-        .map((color) => color.trim())
+        .map(color => color.trim())
+        .filter(Boolean)
+      const tags = formData.tags
+        .split(",")
+        .map(tag => tag.trim())
         .filter(Boolean)
 
       const response = await fetch(url, {
@@ -173,6 +176,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
           ...numericFields,
           sizes,
           colors,
+          tags,
           sizeRange: formData.sizeRange,
         }),
       })
@@ -196,6 +200,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
+          {/* Sección de Título y Descripción */}
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-4">
@@ -210,7 +215,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                     required
                   />
                 </div>
-
                 <div>
                   <Label htmlFor="description">Descripción</Label>
                   <Textarea
@@ -226,17 +230,17 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
             </CardContent>
           </Card>
 
+          {/* Sección de Imágenes */}
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Imágenes</h3>
-
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
                 {formData.images.map((image, index) => (
                   <div key={index} className="relative aspect-square rounded-md overflow-hidden border group">
                     <Image
                       loader={customLoader}
-                      src={image || "/placeholder.svg"}
-                      alt={`Product image ${index + 1}`}
+                      src={image}
+                      alt={`Imagen del producto ${index + 1}`}
                       fill
                       className="object-cover"
                     />
@@ -251,24 +255,22 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                     </Button>
                   </div>
                 ))}
-
                 <label className="border border-dashed rounded-md flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-muted/50 transition-colors">
                   <Upload className="h-6 w-6 mb-2 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Subir imagen</span>
                   <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                 </label>
               </div>
-
               <p className="text-sm text-muted-foreground">
                 Agrega hasta 10 imágenes para mostrar tu producto desde diferentes ángulos.
               </p>
             </CardContent>
           </Card>
 
+          {/* Sección de Precios */}
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Precios</h3>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price">Precio</Label>
@@ -287,7 +289,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                     />
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="compareAtPrice">Precio comparativo</Label>
                   <div className="relative">
@@ -304,7 +305,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                     />
                   </div>
                 </div>
-
                 <div>
                   <Label htmlFor="costPerItem">Costo por artículo</Label>
                   <div className="relative">
@@ -325,10 +325,10 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
             </CardContent>
           </Card>
 
+          {/* Sección de Variantes */}
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Variantes</h3>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="sizes">Tamaños</Label>
@@ -341,7 +341,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                   />
                   <p className="text-xs text-muted-foreground mt-1">Separados por comas</p>
                 </div>
-
                 <div>
                   <Label htmlFor="colors">Colores</Label>
                   <Input
@@ -353,7 +352,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                   />
                   <p className="text-xs text-muted-foreground mt-1">Separados por comas</p>
                 </div>
-
                 <div className="sm:col-span-2">
                   <Label>Rango de tamaños numéricos</Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
@@ -386,21 +384,19 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
             </CardContent>
           </Card>
 
+          {/* Sección de Inventario */}
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Inventario</h3>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sku">SKU (Código de producto)</Label>
+                  <Label htmlFor="sku">SKU</Label>
                   <Input id="sku" name="sku" value={formData.sku} onChange={handleChange} />
                 </div>
-
                 <div>
                   <Label htmlFor="barcode">Código de barras</Label>
                   <Input id="barcode" name="barcode" value={formData.barcode} onChange={handleChange} />
                 </div>
-
                 <div>
                   <Label htmlFor="quantity">Cantidad</Label>
                   <Input
@@ -412,7 +408,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
                     onChange={handleChange}
                   />
                 </div>
-
                 <div className="flex items-center space-x-2 pt-8">
                   <Switch
                     id="trackInventory"
@@ -426,14 +421,14 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
           </Card>
         </div>
 
+        {/* Columna derecha */}
         <div className="space-y-8">
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Estado</h3>
-
               <Select
                 value={formData.status.toString()}
-                onValueChange={(value) => handleSelectChange("status", Number(value))}
+                onValueChange={(value) => handleSelectChange("status", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar estado" />
@@ -449,23 +444,34 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
           <Card>
             <CardContent className="pt-6">
               <h3 className="font-medium mb-4">Organización</h3>
-
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="productType">Tipo de producto</Label>
-                  <Input id="productType" name="productType" value={formData.productType} onChange={handleChange} />
+                  <Input
+                    id="productType"
+                    name="productType"
+                    value={formData.productType}
+                    onChange={handleChange}
+                  />
                 </div>
-
                 <div>
                   <Label htmlFor="vendor">Proveedor</Label>
-                  <Input id="vendor" name="vendor" value={formData.vendor} onChange={handleChange} />
+                  <Input
+                    id="vendor"
+                    name="vendor"
+                    value={formData.vendor}
+                    onChange={handleChange}
+                  />
                 </div>
-
                 <div>
                   <Label htmlFor="category">Categoría</Label>
-                  <Input id="category" name="category" value={formData.category} onChange={handleChange} />
+                  <Input
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                  />
                 </div>
-
                 <div>
                   <Label htmlFor="tags">Etiquetas</Label>
                   <Input
