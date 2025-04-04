@@ -12,21 +12,29 @@ const db = drizzle(
 );
 
 // 🔹 Obtener un producto por ID
-export async function GET(req: NextRequest, { params }: any) {
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
+
   try {
     const product = await db
       .select()
       .from(products)
-      .where(eq(products.id, Number(params.id)))
+      .where(eq(products.id, Number(id)))
       .limit(1);
 
     if (!product.length) {
       return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
     }
 
+    const prod = product[0];
+
     return NextResponse.json({
-      ...product[0],
-      images: product[0].images ? JSON.parse(product[0].images) : [],
+      ...prod,
+      images: prod.images
+        ? Array.isArray(prod.images)
+          ? prod.images
+          : JSON.parse(prod.images)
+        : [],
     });
   } catch (error) {
     console.error("Error al obtener producto:", error);
@@ -35,9 +43,11 @@ export async function GET(req: NextRequest, { params }: any) {
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(req: NextRequest, { params }: any) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
+
   try {
-    if (!params.id) {
+    if (!id) {
       return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
     }
 
@@ -51,7 +61,7 @@ export async function PUT(req: NextRequest, { params }: any) {
     await db
       .update(products)
       .set({ ...body, images: JSON.stringify(body.images) })
-      .where(eq(products.id, Number(params.id)));
+      .where(eq(products.id, Number(id)));
 
     return NextResponse.json({ message: "Producto actualizado correctamente" });
   } catch (error) {
@@ -61,13 +71,15 @@ export async function PUT(req: NextRequest, { params }: any) {
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(req: NextRequest, { params }: any) {
+export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
+
   try {
-    if (!params?.id || !/^\d+$/.test(params.id)) {
+    if (!id || !/^\d+$/.test(id)) {
       return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
     }
 
-    const productId = parseInt(params.id, 10);
+    const productId = parseInt(id, 10);
 
     const [product] = await db
       .select()
