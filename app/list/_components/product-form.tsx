@@ -492,7 +492,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
       <Separator />
 
       <div className="flex justify-end gap-4">
-        {(initialData?.id || id) && <DeleteButton id={initialData?.id || id} />}
+        {(initialData?.id || id) && <DeleteButton id={(initialData?.id || id)!} />}
         <Button type="button" variant="outline" onClick={() => router.back()} disabled={isLoading}>
           Cancelar
         </Button>
