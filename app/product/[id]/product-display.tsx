@@ -138,11 +138,16 @@ export default function ProductDisplay({ product }: { product: Product }) {
             </div>
 
             <div className="flex items-center gap-3 mt-2">
-              <p className="text-2xl font-semibold text-primary">${product.price.toFixed(2)}</p>
+              <p className="text-2xl font-semibold text-primary">
+                ${product.price ? product.price.toFixed(2) : 'N/A'}
+              </p>
               {product.compareAtPrice && product.compareAtPrice > product.price && (
-                <p className="text-lg text-muted-foreground line-through">${product.compareAtPrice.toFixed(2)}</p>
+                <p className="text-lg text-muted-foreground line-through">
+                  ${product.compareAtPrice.toFixed(2)}
+                </p>
               )}
             </div>
+
 
             <div className="flex items-center gap-2">
               {product.status ? (
