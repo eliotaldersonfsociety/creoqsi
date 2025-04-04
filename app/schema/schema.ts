@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, real, sql } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -18,20 +18,20 @@ export const products = sqliteTable("products", {
   barcode: text("barcode"),
   quantity: integer("quantity").notNull().default(0),
   trackInventory: integer("track_inventory", { mode: "boolean" }).default(false),
-  images: text("images", { mode: "json" }).notNull().$type<string[]>().default(sql`'[]'`),
-  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>().default(sql`'[]'`),
+  images: text("images", { mode: "json" }).notNull().$type<string[]>().default([]),
+  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>().default([]),
   sizeRange: text("size_range", { mode: "json" })
     .notNull()
     .$type<{ min: number; max: number }>()
-    .default(sql`'{"min":0,"max":0}'`),
-  colors: text("colors", { mode: "json" }).notNull().$type<string[]>().default(sql`'[]'`),
+    .default({ min: 0, max: 0 }),
+  colors: text("colors", { mode: "json" }).notNull().$type<string[]>().default([]),
 });
 
-// Esquema Zod para inserción
+// Esquema Zod para validación
 export const insertProductSchema = createInsertSchema(products, {
-  title: z.string().min(3, "Título debe tener al menos 3 caracteres"),
-  price: z.number().positive("Precio debe ser un número positivo"),
-  images: z.array(z.string().url("Las imágenes deben ser URLs válidas")).min(1, "Se requiere al menos una imagen"),
+  title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
+  price: z.number().positive("El precio debe ser un número positivo"),
+  images: z.array(z.string().url("Las imágenes deben ser URLs válidas")).min(1),
   sizes: z.array(z.string()).default([]),
   colors: z.array(z.string()).default([]),
   sizeRange: z.object({
