@@ -30,7 +30,9 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json({
         ...product[0],
-        images: product[0].images ? JSON.parse(product[0].images) : [],
+        images: typeof product[0].images === "string" 
+          ? JSON.parse(product[0].images)
+          : product[0].images || []
       });
     }
 
@@ -38,7 +40,9 @@ export async function GET(req: NextRequest) {
     const allProducts = await db.select().from(products);
     const formattedProducts = allProducts.map((product) => ({
       ...product,
-      images: product.images ? JSON.parse(product.images) : [],
+      images: typeof product.images === "string" 
+        ? JSON.parse(product.images)
+        : product.images || []
     }));
 
     return NextResponse.json(formattedProducts);
@@ -72,34 +76,37 @@ export async function POST(req: NextRequest) {
 
     if (!title || !price || !images || !Array.isArray(images) || images.length === 0) {
       return NextResponse.json(
-        { error: "Title, price, and at least one image are required" },
+        { error: "Se requieren título, precio y al menos una imagen" },
         { status: 400 }
       );
     }
 
     await db.insert(products).values({
       title,
-      description,
-      price,
-      compareAtPrice,
-      costPerItem,
-      vendor,
-      productType,
-      status,
-      category,
-      tags,
-      sku,
-      barcode,
-      quantity,
-      trackInventory,
+      description: description || "",
+      price: Number(price),
+      compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
+      costPerItem: costPerItem ? Number(costPerItem) : null,
+      vendor: vendor || "",
+      productType: productType || "physical",
+      status: Boolean(status),
+      category: category || "",
+      tags: tags || "",
+      sku: sku || "",
+      barcode: barcode || "",
+      quantity: quantity ? Number(quantity) : 0,
+      trackInventory: Boolean(trackInventory),
       images: JSON.stringify(images),
     });
 
-    return NextResponse.json({ message: "Product added successfully" }, { status: 201 });
+    return NextResponse.json(
+      { message: "Producto creado exitosamente" }, 
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error al guardar el producto:", error);
     return NextResponse.json(
-      { error: "Error al guardar el producto" },
+      { error: "Error interno del servidor" },
       { status: 500 }
     );
   }
