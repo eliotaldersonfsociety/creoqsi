@@ -12,14 +12,12 @@ const db = drizzle(
 );
 
 // 🔹 Obtener un producto por ID
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
-
+export async function GET(req: NextRequest, { params }: any) {
   try {
     const product = await db
       .select()
       .from(products)
-      .where(eq(products.id, Number(id)))
+      .where(eq(products.id, Number(params.id)))
       .limit(1);
 
     if (!product.length) {
@@ -37,11 +35,9 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
-
+export async function PUT(req: NextRequest, { params }: any) {
   try {
-    if (!id) {
+    if (!params.id) {
       return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
     }
 
@@ -55,7 +51,7 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
     await db
       .update(products)
       .set({ ...body, images: JSON.stringify(body.images) })
-      .where(eq(products.id, Number(id)));
+      .where(eq(products.id, Number(params.id)));
 
     return NextResponse.json({ message: "Producto actualizado correctamente" });
   } catch (error) {
@@ -65,15 +61,13 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
-
+export async function DELETE(req: NextRequest, { params }: any) {
   try {
-    if (!id || !/^\d+$/.test(id)) {
+    if (!params?.id || !/^\d+$/.test(params.id)) {
       return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
     }
 
-    const productId = parseInt(id, 10);
+    const productId = parseInt(params.id, 10);
 
     const [product] = await db
       .select()
