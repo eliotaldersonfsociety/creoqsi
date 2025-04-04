@@ -1,4 +1,3 @@
-// app/products/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
@@ -20,10 +19,15 @@ export async function GET(req: NextRequest) {
     const productId = searchParams.get("id");
 
     if (productId) {
+      const numericId = Number(productId);
+      if (isNaN(numericId)) {
+        return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+      }
+
       const result = await db
         .select()
         .from(products)
-        .where(eq(products.id, Number(productId)));
+        .where(eq(products.id, numericId));
 
       if (result.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
@@ -37,7 +41,10 @@ export async function GET(req: NextRequest) {
 
   } catch (error) {
     console.error("Error al obtener productos:", error);
-    return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
   }
 }
 
@@ -46,18 +53,22 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     
-    // Validar con Zod
+    // Validación Zod
     const validation = insertProductSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors.map(e => e.message) },
-        { status: 400 }
-      );
+      const errors = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+      return NextResponse.json({ error: errors }, { status: 400 });
     }
 
-    // Insertar en la base de datos
+    // Insertar con valores procesados
     const result = await db.insert(products)
-      .values(validation.data)
+      .values({
+        ...validation.data,
+        images: validation.data.images,
+        sizes: validation.data.sizes,
+        colors: validation.data.colors,
+        sizeRange: validation.data.sizeRange
+      })
       .returning();
 
     return NextResponse.json({
