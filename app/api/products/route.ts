@@ -70,7 +70,7 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
   }
 }
 
-// Manejador GET para obtener productos
+// Manejador GET para obtener productoss
 export async function GET(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
