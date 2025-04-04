@@ -26,6 +26,7 @@ export default function ProductPage() {
     fetch(`/api/products?id=${params.id}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Producto recibido:", data)
         if (!data) router.push("/404")
         else setProduct(data)
       })
