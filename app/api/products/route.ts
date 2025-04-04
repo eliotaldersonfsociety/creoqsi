@@ -1,8 +1,13 @@
 import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { NextRequest, NextResponse } from "next/server";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
+import { eq } from "drizzle-orm";
 
-export const products = sqliteTable("products", {
+// Definición de la tabla de productos
+const products = sqliteTable("products", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   description: text("description"),
@@ -11,30 +16,25 @@ export const products = sqliteTable("products", {
   costPerItem: real("cost_per_item"),
   vendor: text("vendor"),
   productType: text("product_type"),
-  status: integer("status", { mode: "boolean" }).notNull().default(1), // ✅ 1 = activo, 0 = inactivo
+  status: integer("status", { mode: "boolean" }).notNull().default(1),
   category: text("category"),
   tags: text("tags"),
   sku: text("sku"),
   barcode: text("barcode"),
   quantity: integer("quantity").notNull().default(0),
   trackInventory: integer("track_inventory", { mode: "boolean" }).default(false),
-  images: text("images", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
-  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
-  sizeRange: text("size_range", { mode: "json" }).notNull().$type<{ min: number; max: number }>(), // ✅ JSON nativo para Drizzle
-  colors: text("colors", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
+  images: text("images", { mode: "json" }).notNull().$type<string[]>(),
+  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(),
+  sizeRange: text("size_range", { mode: "json" }).notNull().$type<{ min: number; max: number }>(),
+  colors: text("colors", { mode: "json" }).notNull().$type<string[]>(),
 });
 
-// 🔹 Esquemas Zod para validación
-export const insertProductSchema = createInsertSchema(products);
-export const selectProductSchema = createSelectSchema(products);
+// Esquemas Zod para validación
+const insertProductSchema = createInsertSchema(products);
+const selectProductSchema = createSelectSchema(products);
 
-// 🔹 Tipo TypeScript basado en Zod
-export type Product = z.infer<typeof selectProductSchema>;
-
-import { NextRequest, NextResponse } from "next/server";
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
-import { eq } from "drizzle-orm";
+// Tipo TypeScript basado en Zod
+type Product = z.infer<typeof selectProductSchema>;
 
 const db = drizzle(
   createClient({
@@ -70,7 +70,7 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
   }
 }
 
-// 🔹 Obtener productos (GET)
+// Manejador GET para obtener productos
 export async function GET(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// 🔹 Crear producto (POST)
+// Manejador POST para crear un producto
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
         sku: body.sku || null,
         barcode: body.barcode || null,
         quantity: body.quantity ? Number(body.quantity) : 0,
-        trackInventory: body.trackInventory ? 1 : 0, // Corregido aquí
+        trackInventory: body.trackInventory ? 1 : 0,
         images: JSON.stringify(body.images),
         sizes: body.sizes ? JSON.stringify(body.sizes) : "[]",
         sizeRange: body.sizeRange ? JSON.stringify(body.sizeRange) : JSON.stringify({ min: 18, max: 45 }),
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// 🔹 Actualizar producto (PUT)
+// Manejador PUT para actualizar un producto
 export async function PUT(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
@@ -209,7 +209,7 @@ export async function PUT(req: NextRequest) {
     if (body.sku !== undefined) updateData.sku = body.sku;
     if (body.barcode !== undefined) updateData.barcode = body.barcode;
     if (body.quantity !== undefined) updateData.quantity = Number(body.quantity);
-    if (body.trackInventory !== undefined) updateData.trackInventory = body.trackInventory ? 1 : 0; // Corregido aquí
+    if (body.trackInventory !== undefined) updateData.trackInventory = body.trackInventory ? 1 : 0;
     if (body.images !== undefined) updateData.images = JSON.stringify(body.images);
     if (body.sizes !== undefined) updateData.sizes = JSON.stringify(body.sizes);
     if (body.sizeRange !== undefined) updateData.sizeRange = JSON.stringify(body.sizeRange);
@@ -229,7 +229,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
-// 🔹 Eliminar producto (DELETE)
+// Manejador DELETE para eliminar un producto
 export async function DELETE(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
