@@ -12,12 +12,24 @@ const db = drizzle(
 );
 
 // 🔹 Obtener un producto por ID
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  try {
-    const product = await db.select().from(products).where(eq(products.id, Number(params.id))).limit(1);
-    if (!product.length) return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
 
-    return NextResponse.json({ ...product[0], images: product[0].images ? JSON.parse(product[0].images) : [] });
+  try {
+    const product = await db
+      .select()
+      .from(products)
+      .where(eq(products.id, Number(id)))
+      .limit(1);
+
+    if (!product.length) {
+      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      ...product[0],
+      images: product[0].images ? JSON.parse(product[0].images) : [],
+    });
   } catch (error) {
     console.error("Error al obtener producto:", error);
     return NextResponse.json({ error: "Error al obtener producto" }, { status: 500 });
@@ -25,13 +37,14 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
+
   try {
-    if (!params.id) {
+    if (!id) {
       return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
     }
 
-    // Verifica si el request tiene body
     const textBody = await req.text();
     if (!textBody) {
       return NextResponse.json({ error: "El cuerpo de la solicitud está vacío" }, { status: 400 });
@@ -39,9 +52,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     const body = JSON.parse(textBody);
 
-    await db.update(products)
+    await db
+      .update(products)
       .set({ ...body, images: JSON.stringify(body.images) })
-      .where(eq(products.id, Number(params.id)));
+      .where(eq(products.id, Number(id)));
 
     return NextResponse.json({ message: "Producto actualizado correctamente" });
   } catch (error) {
@@ -50,29 +64,25 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// 🔹 Eliminar un producto por ID
+export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
+
   try {
-    if (!params?.id || !/^\d+$/.test(params.id)) {
-      return NextResponse.json(
-        { error: "ID de producto inválido o faltante" },
-        { status: 400 }
-      );
+    if (!id || !/^\d+$/.test(id)) {
+      return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
     }
 
-    const productId = parseInt(params.id, 10);
-    const [product] = await db.select()
+    const productId = parseInt(id, 10);
+
+    const [product] = await db
+      .select()
       .from(products)
       .where(eq(products.id, productId))
       .limit(1);
 
     if (!product) {
-      return NextResponse.json(
-        { error: "Producto no encontrado" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
     }
 
     await db.delete(products).where(eq(products.id, productId));
@@ -84,9 +94,6 @@ export async function DELETE(
     });
   } catch (error) {
     console.error("Error en DELETE /api/products/[id]:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
