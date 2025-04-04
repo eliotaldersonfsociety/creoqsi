@@ -70,7 +70,7 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
   }
 }
 
-// Manejador GET para obtener productoss
+// Manejador GET para obtener productos
 export async function GET(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
         costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
         vendor: body.vendor || null,
         productType: body.productType || null,
-        status: numericStatus,
+        status: numericStatus as number, // Asegúrate de que sea un número
         category: body.category || null,
         tags: body.tags ? JSON.stringify(body.tags) : "[]",
         sku: body.sku || null,
