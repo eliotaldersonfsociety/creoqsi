@@ -13,7 +13,7 @@ const db = drizzle(
 
 // 🔹 Obtener un producto por ID
 export async function GET(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
@@ -47,7 +47,7 @@ export async function GET(
 
 // 🔹 Actualizar un producto por ID
 export async function PUT(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
@@ -57,12 +57,7 @@ export async function PUT(
       return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
     }
 
-    const textBody = await req.text();
-    if (!textBody) {
-      return NextResponse.json({ error: "El cuerpo de la solicitud está vacío" }, { status: 400 });
-    }
-
-    const body = JSON.parse(textBody);
+    const body = await request.json();
 
     await db
       .update(products)
@@ -78,7 +73,7 @@ export async function PUT(
 
 // 🔹 Eliminar un producto por ID
 export async function DELETE(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
