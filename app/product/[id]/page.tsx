@@ -3,8 +3,28 @@
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import ProductDisplay from "./product-display"
-import { Product } from "@/types/product"
 
+interface Product {
+  id: number
+  title: string
+  description: string
+  price: number
+  compareAtPrice?: number
+  costPerItem?: number
+  vendor?: string
+  productType?: string
+  status?: boolean
+  category?: string
+  tags?: string
+  sku?: string
+  barcode?: string
+  quantity?: number
+  trackInventory?: boolean
+  images: string[]
+  sizes?: string[]
+  sizeRange?: { min: number; max: number }
+  colors?: string[]
+}
 export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null)
   const router = useRouter()
