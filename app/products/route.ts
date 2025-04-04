@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { products } from "@/app/schema/schema";
+import { sql } from "drizzle-orm";
 
 const db = drizzle(
   createClient({
@@ -21,8 +22,7 @@ export async function GET(req: NextRequest) {
       const result = await db
         .select()
         .from(products)
-        .where(eq(products.id, Number(productId)))
-        .limit(1);
+        .where(eq(products.id, Number(productId)));
 
       if (result.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
@@ -31,14 +31,14 @@ export async function GET(req: NextRequest) {
       const product = result[0];
       return NextResponse.json({
         ...product,
-        images: typeof product.images === "string" ? JSON.parse(product.images) : product.images
+        images: Array.isArray(product.images) ? product.images : JSON.parse(product.images || '[]')
       });
     }
 
     const allProducts = await db.select().from(products);
     const formattedProducts = allProducts.map(product => ({
       ...product,
-      images: typeof product.images === "string" ? JSON.parse(product.images) : product.images
+      images: Array.isArray(product.images) ? product.images : JSON.parse(product.images || '[]')
     }));
 
     return NextResponse.json(formattedProducts);
@@ -53,38 +53,55 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     
-    if (!body.title || !body.price || !body.images || !Array.isArray(body.images)) {
+    // Validación de campos requeridos
+    const requiredFields = ['title', 'price', 'images'];
+    const missingFields = requiredFields.filter(field => !body[field]);
+    
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { error: "Título, precio e imágenes son requeridos" },
+        { error: `Campos requeridos faltantes: ${missingFields.join(', ')}` },
         { status: 400 }
       );
     }
 
-    const insertData = {
-      title: body.title,
-      description: body.description || null,
+    if (!Array.isArray(body.images)) {
+      return NextResponse.json(
+        { error: "Las imágenes deben ser un array" },
+        { status: 400 }
+      );
+    }
+
+    // Construir objeto de inserción con tipos explícitos
+    const insertData: typeof products.$inferInsert = {
+      title: String(body.title),
+      description: body.description ? String(body.description) : null,
       price: Number(body.price),
       compareAtPrice: body.compareAtPrice ? Number(body.compareAtPrice) : null,
       costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
-      vendor: body.vendor || null,
-      productType: body.productType || 'physical',
+      vendor: body.vendor ? String(body.vendor) : null,
+      productType: body.productType ? String(body.productType) : 'physical',
       status: Boolean(body.status),
-      category: body.category || null,
-      tags: body.tags || null,
-      sku: body.sku || null,
-      barcode: body.barcode || null,
+      category: body.category ? String(body.category) : null,
+      tags: body.tags ? String(body.tags) : null,
+      sku: body.sku ? String(body.sku) : null,
+      barcode: body.barcode ? String(body.barcode) : null,
       quantity: body.quantity ? Number(body.quantity) : 0,
       trackInventory: Boolean(body.trackInventory),
-      images: JSON.stringify(body.images),
+      images: sql`${JSON.stringify(body.images)}`
     };
 
-    const result = await db.insert(products).values(insertData).returning();
+    // Insertar usando consulta preparada
+    const result = await db.insert(products)
+      .values(insertData)
+      .returning()
+      .prepare()
+      .execute();
 
     return NextResponse.json({
       message: "Producto creado exitosamente",
       data: {
         ...result[0],
-        images: typeof result[0].images === "string" ? JSON.parse(result[0].images) : result[0].images
+        images: Array.isArray(result[0].images) ? result[0].images : JSON.parse(result[0].images)
       }
     }, { status: 201 });
 
