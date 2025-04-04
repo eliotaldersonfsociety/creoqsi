@@ -3,14 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import ProductDisplay from "./product-display"
-
-interface Product {
-  id: number
-  title: string
-  description: string
-  price: number
-  images: string[]
-}
+import { Product } from "@/types/product"
 
 export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null)
