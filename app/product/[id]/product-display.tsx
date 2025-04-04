@@ -208,7 +208,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 </Button>
               </div>
 
-              {product.sizes?.length > 0 && (
+              {product.sizes && product.sizes.length > 0 && (
                 <div className="space-y-2">
                   <Label htmlFor="size" className="text-base">
                     Size
@@ -252,7 +252,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 )
               })()}
 
-              {product.colors?.length > 0 && (
+              {product.colors && product.colors.length > 0 && (
                 <div className="space-y-2">
                   <Label htmlFor="color" className="text-base">
                     Color
