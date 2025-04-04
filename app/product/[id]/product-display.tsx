@@ -21,6 +21,7 @@ const getRandomRating = () => parseFloat((Math.random() * (5 - 3.8) + 3.8).toFix
 const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23
 
 export default function ProductDisplay({ product }: { product: Product }) {
+  console.log("Product Data:", product); // Add this line
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
 
