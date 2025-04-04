@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { products, insertProductSchema } from "@/app/schema/schema";
-import { z } from "zod";
 
 const db = drizzle(
   createClient({
@@ -53,22 +52,16 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     
-    // Validación Zod
-    const validation = insertProductSchema.safeParse(body);
-    if (!validation.success) {
-      const errors = validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
+    // Validar con Zod
+    const validationResult = insertProductSchema.safeParse(body);
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
       return NextResponse.json({ error: errors }, { status: 400 });
     }
 
-    // Insertar con valores procesados
+    // Insertar en la base de datos
     const result = await db.insert(products)
-      .values({
-        ...validation.data,
-        images: validation.data.images,
-        sizes: validation.data.sizes,
-        colors: validation.data.colors,
-        sizeRange: validation.data.sizeRange
-      })
+      .values(validationResult.data)
       .returning();
 
     return NextResponse.json({
