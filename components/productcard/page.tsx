@@ -5,7 +5,7 @@ import { Eye, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Product } from "@/types/product"; // Importa la interfaz compartida
+import Product from "@/types/product"; // Importa la interfaz compartida
 
 const customLoader = ({ 
   src, 
