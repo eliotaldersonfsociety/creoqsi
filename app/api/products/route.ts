@@ -16,13 +16,13 @@ const products = sqliteTable("products", {
   costPerItem: real("cost_per_item"),
   vendor: text("vendor"),
   productType: text("product_type"),
-  status: integer("status", { mode: "boolean" }).notNull().default(1),
+  status: integer("status").notNull().default(1), // Cambiado a integer
   category: text("category"),
   tags: text("tags"),
   sku: text("sku"),
   barcode: text("barcode"),
   quantity: integer("quantity").notNull().default(0),
-  trackInventory: integer("track_inventory", { mode: "boolean" }).default(false),
+  trackInventory: integer("track_inventory").default(0), // Cambiado a integer
   images: text("images", { mode: "json" }).notNull().$type<string[]>(),
   sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(),
   sizeRange: text("size_range", { mode: "json" }).notNull().$type<{ min: number; max: number }>(),
