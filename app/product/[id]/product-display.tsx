@@ -38,14 +38,12 @@ const customLoader = ({ src, width, quality }: { src: string; width: number; qua
 }
 
 const getRandomRating = () => parseFloat((Math.random() * (5 - 3.8) + 3.8).toFixed(1))
-
 const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23
 
 export default function ProductDisplay({ product }: { product: Product }) {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
 
-  // Calculate discount percentage if compareAtPrice exists
   const discountPercentage = product.compareAtPrice
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0
@@ -54,17 +52,11 @@ export default function ProductDisplay({ product }: { product: Product }) {
   const fullStars = Math.floor(rating)
   const hasHalfStar = rating % 1 >= 0.5
 
-  const increaseQuantity = () => {
-    setQuantity((prev) => prev + 1)
-  }
-
-  const decreaseQuantity = () => {
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
-  }
+  const increaseQuantity = () => setQuantity((prev) => prev + 1)
+  const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
-      {/* Breadcrumbs */}
       <div className="text-sm text-muted-foreground mb-6">
         <span className="hover:underline cursor-pointer">Home</span> /
         <span className="hover:underline cursor-pointer mx-2">{product.category || "Products"}</span> /
@@ -72,14 +64,13 @@ export default function ProductDisplay({ product }: { product: Product }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-        {/* Product Images */}
         <div className="space-y-4">
-          {Array.isArray(product.images) && product.images.length > 0 ? (
+          {product.images?.length > 0 ? (
             <>
               <div className="relative aspect-square overflow-hidden rounded-lg border bg-background">
                 <Image
                   loader={customLoader}
-                  src={product.images[selectedImage] || "/placeholder.svg"}
+                  src={product.images[selectedImage]}
                   alt={product.title}
                   fill
                   className="object-contain"
@@ -103,7 +94,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                     >
                       <Image
                         loader={customLoader}
-                        src={image || "/placeholder.svg"}
+                        src={image}
                         alt={`${product.title} - Image ${index + 1}`}
                         fill
                         className="object-contain"
@@ -117,7 +108,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
             <div className="relative aspect-square overflow-hidden rounded-lg border bg-background">
               <Image
                 loader={customLoader}
-                src="/placeholder.svg?height=600&width=600"
+                src="/placeholder.svg"
                 alt={product.title}
                 fill
                 className="object-cover"
@@ -126,7 +117,6 @@ export default function ProductDisplay({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Product Info */}
         <div className="flex flex-col space-y-6">
           <div className="space-y-2">
             {product.vendor && (
@@ -138,14 +128,12 @@ export default function ProductDisplay({ product }: { product: Product }) {
 
             <div className="flex items-center gap-2">
               <div className="flex items-center">
-                {/* Estrellas llenas */}
                 {[...Array(fullStars)].map((_, index) => (
                   <svg key={index} className="w-4 h-4 fill-current text-yellow-500" viewBox="0 0 24 24">
                     <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" />
                   </svg>
                 ))}
 
-                {/* Media estrella */}
                 {hasHalfStar && (
                   <svg className="w-4 h-4 fill-current text-yellow-500" viewBox="0 0 24 24">
                     <defs>
@@ -158,7 +146,6 @@ export default function ProductDisplay({ product }: { product: Product }) {
                   </svg>
                 )}
 
-                {/* Estrellas vacías */}
                 {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, index) => (
                   <svg key={`empty-${index}`} className="w-4 h-4 fill-current text-gray-300" viewBox="0 0 24 24">
                     <path d="M12 17.27L18.18 21L16.54 13.97L22 9.24L14.81 8.63L12 2L9.19 8.63L2 9.24L7.46 13.97L5.82 21L12 17.27Z" />
@@ -166,7 +153,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 ))}
               </div>
               <div className="text-sm text-muted-foreground">
-                <span className="hover:underline cursor-pointer">23 reviews</span>
+                <span className="hover:underline cursor-pointer">{getRandomReviews()} reviews</span>
               </div>
             </div>
 
@@ -221,19 +208,19 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 </Button>
               </div>
 
-              {product.sizes && product.sizes.length > 0 && (
+              {product.sizes?.length > 0 && (
                 <div className="space-y-2">
                   <Label htmlFor="size" className="text-base">
                     Size
                   </Label>
-                  <RadioGroup id="size" defaultValue={product.sizes[0]} className="flex flex-wrap items-center gap-2">
-                    {product.sizes.map((size, index) => (
+                  <RadioGroup defaultValue={product.sizes[0]} className="flex flex-wrap items-center gap-2">
+                    {product.sizes.map((size) => (
                       <Label
-                        key={index}
+                        key={size}
                         htmlFor={`size-${size}`}
                         className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-muted"
                       >
-                        <RadioGroupItem id={`size-${size}`} value={size} />
+                        <RadioGroupItem value={size} id={`size-${size}`} />
                         {size}
                       </Label>
                     ))}
@@ -241,44 +228,43 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 </div>
               )}
 
-              {product.sizeRange && (
-                <div className="space-y-2">
-                  <Label htmlFor="sizeRange" className="text-base">Size Range</Label>
-                  <RadioGroup
-                    id="sizeRange"
-                    defaultValue={product.sizeRange.min.toString()}
-                    className="flex flex-wrap items-center gap-2"
-                  >
-                    {Array.from(
-                      { length: product.sizeRange.max - product.sizeRange.min + 1 },
-                      (_, i) => product.sizeRange.min + i,
-                    ).map((size) => (
-                      <Label
-                        key={size}
-                        htmlFor={`size-range-${size}`}
-                        className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-muted"
-                      >
-                        <RadioGroupItem id={`size-range-${size}`} value={size.toString()} />
-                        {size}
-                      </Label>
-                    ))}
-                  </RadioGroup>
-                </div>
-              )}
+              {product.sizeRange && (() => {
+                const { min, max } = product.sizeRange
+                return (
+                  <div className="space-y-2">
+                    <Label htmlFor="sizeRange" className="text-base">Size Range</Label>
+                    <RadioGroup
+                      defaultValue={min.toString()}
+                      className="flex flex-wrap items-center gap-2"
+                    >
+                      {Array.from({ length: max - min + 1 }, (_, i) => min + i).map((size) => (
+                        <Label
+                          key={size}
+                          htmlFor={`size-range-${size}`}
+                          className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-muted"
+                        >
+                          <RadioGroupItem value={size.toString()} id={`size-range-${size}`} />
+                          {size}
+                        </Label>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                )
+              })()}
 
-              {product.colors && product.colors.length > 0 && (
+              {product.colors?.length > 0 && (
                 <div className="space-y-2">
                   <Label htmlFor="color" className="text-base">
                     Color
                   </Label>
-                  <RadioGroup id="color" defaultValue={product.colors[0]} className="flex flex-wrap items-center gap-2">
-                    {product.colors.map((color, index) => (
+                  <RadioGroup defaultValue={product.colors[0]} className="flex flex-wrap items-center gap-2">
+                    {product.colors.map((color) => (
                       <Label
-                        key={index}
+                        key={color}
                         htmlFor={`color-${color}`}
                         className="border cursor-pointer rounded-md p-2 flex items-center gap-2 [&:has(:checked)]:bg-muted"
                       >
-                        <RadioGroupItem id={`color-${color}`} value={color} />
+                        <RadioGroupItem value={color} id={`color-${color}`} />
                         <div className="flex items-center gap-2">
                           <div
                             className="w-4 h-4 rounded-full border"
@@ -328,59 +314,58 @@ export default function ProductDisplay({ product }: { product: Product }) {
 
           <Separator />
 
-          <Tabs defaultValue="description" className="w-full">
+          <Tabs defaultValue="description">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="shipping">Shipping</TabsTrigger>
             </TabsList>
+            
             <TabsContent value="description" className="pt-4">
-              <div className="space-y-4">
-                <p>{product.description}</p>
-              </div>
+              <p>{product.description}</p>
             </TabsContent>
+            
             <TabsContent value="details" className="pt-4">
-              <div className="space-y-4">
-                <ul className="space-y-2">
+              <ul className="space-y-2">
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">Product ID</span>
+                  <span>{product.id}</span>
+                </li>
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">Category</span>
+                  <span>{product.category || "N/A"}</span>
+                </li>
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">Vendor</span>
+                  <span>{product.vendor || "N/A"}</span>
+                </li>
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">Type</span>
+                  <span>{product.productType || "N/A"}</span>
+                </li>
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">SKU</span>
+                  <span>{product.sku || "N/A"}</span>
+                </li>
+                <li className="flex justify-between py-1 border-b">
+                  <span className="font-medium">Barcode</span>
+                  <span>{product.barcode || "N/A"}</span>
+                </li>
+                {product.tags && (
                   <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">Product ID</span>
-                    <span>{product.id}</span>
+                    <span className="font-medium">Tags</span>
+                    <div className="flex flex-wrap gap-1 justify-end">
+                      {product.tags.split(",").map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag.trim()}
+                        </Badge>
+                      ))}
+                    </div>
                   </li>
-                  <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">Category</span>
-                    <span>{product.category || "N/A"}</span>
-                  </li>
-                  <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">Vendor</span>
-                    <span>{product.vendor || "N/A"}</span>
-                  </li>
-                  <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">Type</span>
-                    <span>{product.productType || "N/A"}</span>
-                  </li>
-                  <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">SKU</span>
-                    <span>{product.sku || "N/A"}</span>
-                  </li>
-                  <li className="flex justify-between py-1 border-b">
-                    <span className="font-medium">Barcode</span>
-                    <span>{product.barcode || "N/A"}</span>
-                  </li>
-                  {typeof product.tags === "string" && product.tags.length > 0 && (
-                    <li className="flex justify-between py-1 border-b">
-                      <span className="font-medium">Tags</span>
-                      <div className="flex flex-wrap gap-1 justify-end">
-                        {product.tags.split(",").map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {tag.trim()}
-                          </Badge>
-                        ))}
-                      </div>
-                    </li>
-                  )}
-                </ul>
-              </div>
+                )}
+              </ul>
             </TabsContent>
+            
             <TabsContent value="shipping" className="pt-4">
               <div className="space-y-4">
                 <p>Free shipping on orders over $50. Standard delivery 3-5 business days.</p>
