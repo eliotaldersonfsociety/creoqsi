@@ -41,8 +41,8 @@ function parseMaybeJSON(value: any, fallback: any = {}) {
 // 🔹 Obtener productos (GET)
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("id");
+    const { pathname } = new URL(req.url);
+    const productId = pathname.split("/").pop();
 
     if (productId) {
       const numericId = Number(productId);
@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
 
     const formattedProducts = allProducts.map((product) => ({
       ...product,
-      status: product.status ?? 0, 
+      status: product.status ?? 0,
       images: parseMaybeJSONOrCSV(product.images),
       tags: parseMaybeJSONOrCSV(product.tags),
       sizes: parseMaybeJSONOrCSV(product.sizes),
@@ -87,7 +87,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });
   }
 }
-
 
 // 🔹 Crear producto (POST)
 export async function POST(req: NextRequest) {
@@ -168,8 +167,8 @@ export async function POST(req: NextRequest) {
 // 🔹 Actualizar producto (PUT)
 export async function PUT(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("id");
+    const { pathname } = new URL(req.url);
+    const productId = pathname.split("/").pop();
 
     if (!productId) {
       return NextResponse.json({ error: "ID de producto requerido" }, { status: 400 });
@@ -221,8 +220,8 @@ export async function PUT(req: NextRequest) {
 // 🔹 Eliminar producto (DELETE)
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("id");
+    const { pathname } = new URL(req.url);
+    const productId = pathname.split("/").pop();
 
     if (!productId) {
       return NextResponse.json({ error: "ID de producto requerido" }, { status: 400 });
