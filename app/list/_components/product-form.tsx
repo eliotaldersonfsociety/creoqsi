@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -26,7 +24,7 @@ interface ProductFormProps {
     costPerItem?: number
     vendor?: string
     productType?: string
-    status?: "active" | "draft"
+    status?: number // Corregido a número
     category?: string
     tags?: string
     sku?: string
@@ -66,6 +64,7 @@ interface FormData {
 export default function ProductForm({ initialData, id }: ProductFormProps) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  
   const initialFormData: FormData = {
     title: initialData?.title || "",
     description: initialData?.description || "",
@@ -74,7 +73,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     costPerItem: initialData?.costPerItem?.toString() || "",
     vendor: initialData?.vendor || "",
     productType: initialData?.productType || "",
-    status: initialData?.status ?? 0,
+    status: initialData?.status ?? 0, // Valor numérico
     category: initialData?.category || "",
     tags: initialData?.tags || "",
     sku: initialData?.sku || "",
@@ -157,7 +156,6 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
         quantity: formData.quantity ? Number.parseInt(formData.quantity) : null,
       }
 
-      // Prepare sizes and colors arrays from comma-separated strings
       const sizes = formData.sizes
         .split(",")
         .map((size) => size.trim())
@@ -498,4 +496,3 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     </form>
   )
 }
-
