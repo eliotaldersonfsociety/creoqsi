@@ -11,12 +11,15 @@ const db = drizzle(
   })
 );
 
+interface ContextProps {
+  params: {
+    id: string;
+  };
+}
+
 // 🔹 Obtener un producto por ID
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function GET(request: NextRequest, context: ContextProps) {
+  const { id } = context.params;
 
   try {
     const product = await db
@@ -46,11 +49,8 @@ export async function GET(
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function PUT(request: NextRequest, context: ContextProps) {
+  const { id } = context.params;
 
   try {
     if (!id) {
@@ -72,11 +72,8 @@ export async function PUT(
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function DELETE(request: NextRequest, context: ContextProps) {
+  const { id } = context.params;
 
   try {
     if (!id || !/^\d+$/.test(id)) {
