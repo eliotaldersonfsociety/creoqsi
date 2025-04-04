@@ -1,3 +1,4 @@
+// app/schema/schema.ts
 import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -11,22 +12,31 @@ export const products = sqliteTable("products", {
   costPerItem: real("cost_per_item"),
   vendor: text("vendor"),
   productType: text("product_type"),
-  status: integer("status", { mode: "boolean" }).notNull().default(1), // ✅ 1 = activo, 0 = inactivo
+  status: integer("status", { mode: "boolean" }).notNull().default(true),
   category: text("category"),
   tags: text("tags"),
   sku: text("sku"),
   barcode: text("barcode"),
   quantity: integer("quantity").notNull().default(0),
   trackInventory: integer("track_inventory", { mode: "boolean" }).default(false),
-  images: text("images", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
-  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
-  sizeRange: text("size_range", { mode: "json" }).notNull().$type<{ min: number; max: number }>(), // ✅ JSON nativo para Drizzle
-  colors: text("colors", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
+  images: text("images", { mode: "json" }).notNull().$type<string[]>(),
+  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(),
+  sizeRange: text("size_range", { mode: "json" })
+    .notNull()
+    .$type<{ min: number; max: number }>(),
+  colors: text("colors", { mode: "json" }).notNull().$type<string[]>(),
 });
 
-// 🔹 Esquemas Zod para validación
-export const insertProductSchema = createInsertSchema(products);
-export const selectProductSchema = createSelectSchema(products);
+// Esquemas Zod
+export const insertProductSchema = createInsertSchema(products, {
+  images: z.array(z.string()).min(1),
+  sizes: z.array(z.string()).optional(),
+  sizeRange: z.object({
+    min: z.number().min(0),
+    max: z.number().min(0)
+  }),
+  colors: z.array(z.string()).optional(),
+});
 
-// 🔹 Tipo TypeScript basado en Zod
+export const selectProductSchema = createSelectSchema(products);
 export type Product = z.infer<typeof selectProductSchema>;
