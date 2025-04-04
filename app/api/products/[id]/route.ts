@@ -12,8 +12,8 @@ const db = drizzle(
 );
 
 // 🔹 Obtener un producto por ID
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function GET(req: NextRequest, { params }) {
+  const { id } = params;
 
   try {
     const product = await db
@@ -43,8 +43,8 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function PUT(req: NextRequest, { params }) {
+  const { id } = params;
 
   try {
     if (!id) {
@@ -71,8 +71,8 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function DELETE(req: NextRequest, { params }) {
+  const { id } = params;
 
   try {
     if (!id || !/^\d+$/.test(id)) {
