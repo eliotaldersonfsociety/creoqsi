@@ -53,6 +53,7 @@ type StatusKey = keyof typeof statusMap;
 
 function parseMaybeJSONOrCSV(value: any): string[] {
   if (!value) return [];
+  if (Array.isArray(value)) return value; // ✅ Si ya es un array, lo devolvemos tal cual
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed : [];
