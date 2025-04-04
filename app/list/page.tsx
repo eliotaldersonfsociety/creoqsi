@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/productcard/page";
 import { getProducts } from "@/app/api/action/route";
-import Product from "@/types/product";
+import { Product } from "@/types/product";
 
 export default async function ProductsPage() {
   const products = await getProducts() as Product[];
