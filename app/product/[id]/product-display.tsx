@@ -11,27 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
-interface Product {
-  id: number
-  title: string
-  description: string
-  price: number
-  compareAtPrice?: number
-  costPerItem?: number
-  vendor?: string
-  productType?: string
-  status?: boolean
-  category?: string
-  tags?: string
-  sku?: string
-  barcode?: string
-  quantity?: number
-  trackInventory?: boolean
-  images: string[]
-  sizes?: string[]
-  sizeRange?: { min: number; max: number }
-  colors?: string[]
-}
+import { Product } from "@/types"
 
 const customLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
   return `${src}?w=${width}&q=${quality || 75}`
