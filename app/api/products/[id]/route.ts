@@ -12,7 +12,10 @@ const db = drizzle(
 );
 
 // 🔹 Obtener un producto por ID
-export async function GET(req: NextRequest, { params }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   try {
@@ -43,7 +46,10 @@ export async function GET(req: NextRequest, { params }) {
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(req: NextRequest, { params }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   try {
@@ -71,7 +77,10 @@ export async function PUT(req: NextRequest, { params }) {
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(req: NextRequest, { params }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   try {
