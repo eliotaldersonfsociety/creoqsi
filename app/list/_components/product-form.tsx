@@ -120,10 +120,11 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     if (file) {
       const reader = new FileReader()
       reader.onload = (event) => {
-        if (event.target?.result && typeof event.target.result === "string") {
+        const result = event.target?.result
+        if (typeof result === "string") {
           setFormData(prev => ({
             ...prev,
-            images: [...prev.images, event.target.result as string]
+            images: [...prev.images, result]
           }))
         }
       }
