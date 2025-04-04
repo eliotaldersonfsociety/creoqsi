@@ -121,6 +121,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Manejador POST para crear un producto
+// Manejador POST para crear un producto
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -151,17 +152,17 @@ export async function POST(req: NextRequest) {
         costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
         vendor: body.vendor || null,
         productType: body.productType || null,
-        status: numericStatus as number, // Asegúrate de que sea un número
+        status: numericStatus,
         category: body.category || null,
-        tags: body.tags ? JSON.stringify(body.tags) : "[]",
+        tags: body.tags || [],
         sku: body.sku || null,
         barcode: body.barcode || null,
         quantity: body.quantity ? Number(body.quantity) : 0,
         trackInventory: body.trackInventory ? 1 : 0,
-        images: JSON.stringify(body.images),
-        sizes: body.sizes ? JSON.stringify(body.sizes) : "[]",
-        sizeRange: body.sizeRange ? JSON.stringify(body.sizeRange) : JSON.stringify({ min: 18, max: 45 }),
-        colors: body.colors ? JSON.stringify(body.colors) : "[]",
+        images: body.images,
+        sizes: body.sizes || [],
+        sizeRange: body.sizeRange || { min: 18, max: 45 },
+        colors: body.colors || [],
       })
       .returning();
 
@@ -171,7 +172,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
-
 // Manejador PUT para actualizar un producto
 export async function PUT(req: NextRequest) {
   try {
