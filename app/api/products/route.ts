@@ -74,15 +74,13 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
 export async function GET(req: NextRequest) {
   try {
     const { pathname } = new URL(req.url);
-    const productId = pathname.split("/").pop();
+    const lastSegment = pathname.split("/").pop();
 
-    if (productId) {
-      const numericId = Number(productId);
-      if (isNaN(numericId)) {
-        return NextResponse.json({ error: "ID inválido" }, { status: 400 });
-      }
+    const maybeId = Number(lastSegment);
+    const isGettingSingleProduct = !isNaN(maybeId) && lastSegment !== "products";
 
-      const product = await db.select().from(products).where(eq(products.id, numericId)).limit(1);
+    if (isGettingSingleProduct) {
+      const product = await db.select().from(products).where(eq(products.id, maybeId)).limit(1);
 
       if (product.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
@@ -101,6 +99,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(formattedProduct);
     }
 
+    // Obtener todos los productos
     const allProducts = await db.select().from(products);
 
     const formattedProducts = allProducts.map((product) => ({
@@ -120,7 +119,6 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// Manejador POST para crear un producto
 // Manejador POST para crear un producto
 export async function POST(req: NextRequest) {
   try {
