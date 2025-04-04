@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Inicializar el cliente de Gemini
+// ✅ Validación de la API Key
 const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("La variable de entorno GEMINI_API_KEY no está definida");
+}
+
+// Inicializar el cliente de Gemini
 const genAI = new GoogleGenerativeAI(apiKey);
 
 const model = genAI.getGenerativeModel({
