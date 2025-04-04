@@ -3,7 +3,6 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { products } from "@/app/schema/schema";
-import { sql } from "drizzle-orm";
 
 const db = drizzle(
   createClient({
@@ -22,15 +21,14 @@ export async function GET(req: NextRequest) {
       const result = await db
         .select()
         .from(products)
-        .where(eq(products.id, sql.placeholder('id')))
-        .prepare()
-        .execute({ id: Number(productId) });
+        .where(eq(products.id, Number(productId)))
+        .limit(1);
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
       }
 
-      const product = result.rows[0] as typeof products.$inferSelect;
+      const product = result[0];
       return NextResponse.json({
         ...product,
         images: typeof product.images === "string" ? JSON.parse(product.images) : product.images
@@ -55,7 +53,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     
-    // Validación de campos requeridos
     if (!body.title || !body.price || !body.images || !Array.isArray(body.images)) {
       return NextResponse.json(
         { error: "Título, precio e imágenes son requeridos" },
@@ -63,8 +60,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Construir objeto de inserción con tipos correctos
-    const insertData: typeof products.$inferInsert = {
+    const insertData = {
       title: body.title,
       description: body.description || null,
       price: Number(body.price),
@@ -82,7 +78,6 @@ export async function POST(req: NextRequest) {
       images: JSON.stringify(body.images),
     };
 
-    // Ejecutar inserción
     const result = await db.insert(products).values(insertData).returning();
 
     return NextResponse.json({
