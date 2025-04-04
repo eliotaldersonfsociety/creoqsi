@@ -11,15 +11,14 @@ const db = drizzle(
   })
 );
 
-interface ContextProps {
-  params: {
-    id: string;
-  };
-}
-
 // 🔹 Obtener un producto por ID
-export async function GET(request: NextRequest, context: ContextProps) {
-  const { id } = context.params;
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
+  }
 
   try {
     const product = await db
@@ -49,14 +48,15 @@ export async function GET(request: NextRequest, context: ContextProps) {
 }
 
 // 🔹 Actualizar un producto por ID
-export async function PUT(request: NextRequest, context: ContextProps) {
-  const { id } = context.params;
+export async function PUT(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id) {
+    return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
+  }
 
   try {
-    if (!id) {
-      return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
-    }
-
     const body = await request.json();
 
     await db
@@ -72,16 +72,17 @@ export async function PUT(request: NextRequest, context: ContextProps) {
 }
 
 // 🔹 Eliminar un producto por ID
-export async function DELETE(request: NextRequest, context: ContextProps) {
-  const { id } = context.params;
+export async function DELETE(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+
+  if (!id || !/^\d+$/.test(id)) {
+    return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
+  }
+
+  const productId = parseInt(id, 10);
 
   try {
-    if (!id || !/^\d+$/.test(id)) {
-      return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
-    }
-
-    const productId = parseInt(id, 10);
-
     const [product] = await db
       .select()
       .from(products)
