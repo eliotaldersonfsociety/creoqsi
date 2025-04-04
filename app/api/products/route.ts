@@ -1,8 +1,40 @@
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
+export const products = sqliteTable("products", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  description: text("description"),
+  price: real("price").notNull(),
+  compareAtPrice: real("compare_at_price"),
+  costPerItem: real("cost_per_item"),
+  vendor: text("vendor"),
+  productType: text("product_type"),
+  status: integer("status", { mode: "boolean" }).notNull().default(1), // ✅ 1 = activo, 0 = inactivo
+  category: text("category"),
+  tags: text("tags"),
+  sku: text("sku"),
+  barcode: text("barcode"),
+  quantity: integer("quantity").notNull().default(0),
+  trackInventory: integer("track_inventory", { mode: "boolean" }).default(false),
+  images: text("images", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
+  sizes: text("sizes", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
+  sizeRange: text("size_range", { mode: "json" }).notNull().$type<{ min: number; max: number }>(), // ✅ JSON nativo para Drizzle
+  colors: text("colors", { mode: "json" }).notNull().$type<string[]>(), // ✅ JSON nativo para Drizzle
+});
+
+// 🔹 Esquemas Zod para validación
+export const insertProductSchema = createInsertSchema(products);
+export const selectProductSchema = createSelectSchema(products);
+
+// 🔹 Tipo TypeScript basado en Zod
+export type Product = z.infer<typeof selectProductSchema>;
+
 import { NextRequest, NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
-import { products } from "@/app/schema/schema";
 
 const db = drizzle(
   createClient({
@@ -19,7 +51,7 @@ const statusMap = {
 
 type StatusKey = keyof typeof statusMap;
 
-function parseMaybeJSONOrCSV(value: any) {
+function parseMaybeJSONOrCSV(value: any): string[] {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
@@ -29,12 +61,114 @@ function parseMaybeJSONOrCSV(value: any) {
   }
 }
 
-function parseMaybeJSON(value: any, fallback: any = {}) {
+function parseMaybeJSON(value: any, fallback: any = {}): any {
   if (!value) return fallback;
   try {
     return typeof value === "string" ? JSON.parse(value) : value;
   } catch {
     return fallback;
+  }
+}
+
+// 🔹 Obtener productos (GET)
+export async function GET(req: NextRequest) {
+  try {
+    const { pathname } = new URL(req.url);
+    const productId = pathname.split("/").pop();
+
+    if (productId) {
+      const numericId = Number(productId);
+      if (isNaN(numericId)) {
+        return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+      }
+
+      const product = await db.select().from(products).where(eq(products.id, numericId)).limit(1);
+
+      if (product.length === 0) {
+        return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+      }
+
+      const formattedProduct = {
+        ...product[0],
+        status: product[0].status ?? 0,
+        images: parseMaybeJSONOrCSV(product[0].images),
+        tags: parseMaybeJSONOrCSV(product[0].tags),
+        sizes: parseMaybeJSONOrCSV(product[0].sizes),
+        sizeRange: parseMaybeJSON(product[0].sizeRange, { min: 18, max: 45 }),
+        colors: parseMaybeJSONOrCSV(product[0].colors),
+      };
+
+      return NextResponse.json(formattedProduct);
+    }
+
+    const allProducts = await db.select().from(products);
+
+    const formattedProducts = allProducts.map((product) => ({
+      ...product,
+      status: product.status ?? 0,
+      images: parseMaybeJSONOrCSV(product.images),
+      tags: parseMaybeJSONOrCSV(product.tags),
+      sizes: parseMaybeJSONOrCSV(product.sizes),
+      sizeRange: parseMaybeJSON(product.sizeRange, { min: 18, max: 45 }),
+      colors: parseMaybeJSONOrCSV(product.colors),
+    }));
+
+    return NextResponse.json(formattedProducts);
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });
+  }
+}
+
+// 🔹 Crear producto (POST)
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+
+    // Validación de campos requeridos
+    const requiredFields = ["title", "price", "images"];
+    const missingFields = requiredFields.filter((field) => !body[field]);
+
+    if (missingFields.length > 0) {
+      return NextResponse.json(
+        { error: `Faltan campos requeridos: ${missingFields.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    // Convertir status a número
+    const status = typeof body.status === "string" ? body.status.toLowerCase() : "draft";
+    const numericStatus = status in statusMap ? statusMap[status as StatusKey] : statusMap.draft;
+
+    // Insertar en la base de datos
+    const result = await db
+      .insert(products)
+      .values({
+        title: body.title,
+        description: body.description || null,
+        price: Number(body.price),
+        compareAtPrice: body.compareAtPrice ? Number(body.compareAtPrice) : null,
+        costPerItem: body.costPerItem ? Number(body.costPerItem) : null,
+        vendor: body.vendor || null,
+        productType: body.productType || null,
+        status: numericStatus,
+        category: body.category || null,
+        tags: body.tags ? JSON.stringify(body.tags) : "[]",
+        sku: body.sku || null,
+        barcode: body.barcode || null,
+        quantity: body.quantity ? Number(body.quantity) : 0,
+        trackInventory: body.trackInventory ? 1 : 0, // Corregido aquí
+        images: JSON.stringify(body.images),
+        sizes: body.sizes ? JSON.stringify(body.sizes) : "[]",
+        sizeRange: body.sizeRange ? JSON.stringify(body.sizeRange) : JSON.stringify({ min: 18, max: 45 }),
+        colors: body.colors ? JSON.stringify(body.colors) : "[]",
+      })
+      .returning();
+
+    return NextResponse.json({ message: "Producto creado exitosamente", productId: result[0].id }, { status: 201 });
+  } catch (error) {
+    console.error("Error al guardar el producto:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
 
@@ -60,7 +194,7 @@ export async function PUT(req: NextRequest) {
     const numericStatus = status && status in statusMap ? statusMap[status as StatusKey] : undefined;
 
     // Construir dinámicamente el objeto con campos definidos
-    const updateData: Partial<Product> = {};
+    const updateData: any = {};
 
     if (body.title !== undefined) updateData.title = body.title;
     if (body.description !== undefined) updateData.description = body.description;
@@ -91,6 +225,30 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: "Producto actualizado exitosamente" });
   } catch (error) {
     console.error("Error al actualizar producto:", error);
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
+  }
+}
+
+// 🔹 Eliminar producto (DELETE)
+export async function DELETE(req: NextRequest) {
+  try {
+    const { pathname } = new URL(req.url);
+    const productId = pathname.split("/").pop();
+
+    if (!productId) {
+      return NextResponse.json({ error: "ID de producto requerido" }, { status: 400 });
+    }
+
+    const numericId = Number(productId);
+    if (isNaN(numericId)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+    }
+
+    await db.delete(products).where(eq(products.id, numericId));
+
+    return NextResponse.json({ message: "Producto eliminado exitosamente" });
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
