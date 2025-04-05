@@ -31,6 +31,7 @@ export default function ProductPage() {
   const params = useParams() // ✅ Obtiene los parámetros de la URL
 
   useEffect(() => {
+    console.log("Product ID from URL:", params.id);
     if (!params.id) {
       router.push("/404")
       return
