@@ -42,6 +42,12 @@ const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23
 
 export default function ProductDisplay({ product }: { product: Product }) {
   console.log("Product Data:", product); // Add this line
+
+// Check if product is undefined or null
+  if (!product) {
+    return <div>Product not found.</div>;
+  }
+  
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
 
