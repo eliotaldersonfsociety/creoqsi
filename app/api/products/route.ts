@@ -74,14 +74,30 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
 // Manejador GET para obtener productos
 export async function GET(req: NextRequest) {
   try {
-    const { pathname } = new URL(req.url);
-    const lastSegment = pathname.split("/").pop();
+    const url = new URL(req.url);
+    const pathname = url.pathname;
+
+    console.log("👉 URL completa:", req.url);
+    console.log("👉 Pathname:", pathname);
+
+    // Asegura que no haya segmentos vacíos (por ejemplo, dobles barras "//")
+    const segments = pathname.split("/").filter(Boolean);
+    const lastSegment = segments[segments.length - 1];
+
+    console.log("👉 Último segmento del path:", lastSegment);
 
     const maybeId = Number(lastSegment);
     const isGettingSingleProduct = !isNaN(maybeId) && lastSegment !== "products";
 
+    console.log("👉 ¿Es una petición individual?", isGettingSingleProduct);
     if (isGettingSingleProduct) {
-      const product = await db.select().from(products).where(eq(products.id, maybeId)).limit(1);
+      const product = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, maybeId))
+        .limit(1);
+
+      console.log("🔍 Producto encontrado:", product);
 
       if (product.length === 0) {
         return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
@@ -100,8 +116,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(formattedProduct);
     }
 
-    // Obtener todos los productos
+    console.log("🔄 Obteniendo todos los productos...");
     const allProducts = await db.select().from(products);
+
+    console.log(`📦 Se encontraron ${allProducts.length} productos`);
 
     const formattedProducts = allProducts.map((product) => ({
       ...product,
@@ -115,10 +133,11 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(formattedProducts);
   } catch (error) {
-    console.error("Error al obtener productos:", error);
+    console.error("❌ Error al obtener productos:", error);
     return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });
   }
 }
+
 
 // Manejador POST para crear un producto
 export async function POST(req: NextRequest) {
