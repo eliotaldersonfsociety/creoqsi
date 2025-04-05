@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
+  console.log("ID recibido en la solicitud:", id); // Verifica el ID recibido
+
   if (!id) {
     return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
   }
@@ -27,11 +29,22 @@ export async function GET(request: NextRequest) {
       .where(eq(products.id, Number(id)))
       .limit(1);
 
+    console.log("Producto obtenido de la base de datos:", product); // Verifica el producto obtenido
+
     if (!product.length) {
       return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
     }
 
     const prod = product[0];
+
+    console.log("Producto a enviar en la respuesta:", {
+      ...prod,
+      images: prod.images
+        ? Array.isArray(prod.images)
+          ? prod.images
+          : JSON.parse(prod.images)
+        : [],
+    }); // Verifica el producto que se enviará en la respuesta
 
     return NextResponse.json({
       ...prod,
