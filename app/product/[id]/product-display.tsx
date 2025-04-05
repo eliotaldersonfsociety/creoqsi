@@ -56,6 +56,10 @@ export default function ProductDisplay({ product }: { product: Product }) {
   const increaseQuantity = () => setQuantity((prev) => prev + 1)
   const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
 
+  console.log("Product Title:", product.title)
+  console.log("Images:", product.images)
+  console.log("Price:", product.price)
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-sm text-muted-foreground mb-6">
