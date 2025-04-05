@@ -60,6 +60,10 @@ export default function ProductDisplay({ product }: { product: Product }) {
   console.log("Images:", product.images)
   console.log("Price:", product.price)
 
+  if (!product || !product.title || !product.images || product.price === undefined) {
+    return <div>Loading...</div>; // or some fallback UI
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-sm text-muted-foreground mb-6">
