@@ -75,21 +75,13 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const pathname = url.pathname;
+    const idParam = url.searchParams.get("id");
 
-    console.log("👉 URL completa:", req.url);
-    console.log("👉 Pathname:", pathname);
+    console.log("👉 Query param id:", idParam);
 
-    // Asegura que no haya segmentos vacíos (por ejemplo, dobles barras "//")
-    const segments = pathname.split("/").filter(Boolean);
-    const lastSegment = segments[segments.length - 1];
+    const maybeId = Number(idParam);
+    const isGettingSingleProduct = !isNaN(maybeId);
 
-    console.log("👉 Último segmento del path:", lastSegment);
-
-    const maybeId = Number(lastSegment);
-    const isGettingSingleProduct = !isNaN(maybeId) && lastSegment !== "products";
-
-    console.log("👉 ¿Es una petición individual?", isGettingSingleProduct);
     if (isGettingSingleProduct) {
       const product = await db
         .select()
@@ -116,11 +108,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(formattedProduct);
     }
 
-    console.log("🔄 Obteniendo todos los productos...");
+    // Si no hay id en query, devuelve todos
     const allProducts = await db.select().from(products);
-
-    console.log(`📦 Se encontraron ${allProducts.length} productos`);
-
     const formattedProducts = allProducts.map((product) => ({
       ...product,
       status: product.status ?? 0,
