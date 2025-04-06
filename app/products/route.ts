@@ -34,10 +34,6 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(result[0]);
     }
-
-    const allProducts = await db.select().from(products);
-    return NextResponse.json(allProducts);
-
   } catch (error) {
     console.error("Error al obtener productos:", error);
     return NextResponse.json(
