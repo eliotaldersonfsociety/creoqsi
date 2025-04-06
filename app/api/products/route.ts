@@ -74,41 +74,6 @@ function parseMaybeJSON(value: any, fallback: any = {}): any {
 // Manejador GET para obtener productos
 export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url);
-    const idParam = url.searchParams.get("id");
-
-    console.log("👉 Query param id:", idParam);
-
-    const maybeId = Number(idParam);
-    const isGettingSingleProduct = !isNaN(maybeId);
-
-    if (isGettingSingleProduct) {
-      const product = await db
-        .select()
-        .from(products)
-        .where(eq(products.id, maybeId))
-        .limit(1);
-
-      console.log("🔍 Producto encontrado:", product);
-
-      if (product.length === 0) {
-        return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
-      }
-
-      const formattedProduct = {
-        ...product[0],
-        status: product[0].status ?? 0,
-        images: parseMaybeJSONOrCSV(product[0].images),
-        tags: parseMaybeJSONOrCSV(product[0].tags),
-        sizes: parseMaybeJSONOrCSV(product[0].sizes),
-        sizeRange: parseMaybeJSON(product[0].sizeRange, { min: 18, max: 45 }),
-        colors: parseMaybeJSONOrCSV(product[0].colors),
-      };
-
-      return NextResponse.json(formattedProduct);
-    }
-
-    // Si no hay id en query, devuelve todos
     const allProducts = await db.select().from(products);
     const formattedProducts = allProducts.map((product) => ({
       ...product,
@@ -119,14 +84,12 @@ export async function GET(req: NextRequest) {
       sizeRange: parseMaybeJSON(product.sizeRange, { min: 18, max: 45 }),
       colors: parseMaybeJSONOrCSV(product.colors),
     }));
-
     return NextResponse.json(formattedProducts);
   } catch (error) {
     console.error("❌ Error al obtener productos:", error);
     return NextResponse.json({ error: "Error al obtener productos" }, { status: 500 });
   }
 }
-
 
 // Manejador POST para crear un producto
 export async function POST(req: NextRequest) {
