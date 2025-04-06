@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([], { status: 404 });
       }
 
-      const prod = product[0];
+      const prod = product[1];
       const formattedProduct = {
         ...prod,
         images: prod.images
