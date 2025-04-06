@@ -37,14 +37,14 @@ export default function ProductPage() {
       return;
     }
 
-    fetch(`/api/products?id=${params.id}`)
+    fetch(`/api/product/{params.id}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Producto recibido:", data);
         if (data.length === 0) {
           router.push("/404");
         } else {
-          setProduct(data[0]); // ✅ Asegúrate de que se esté obteniendo el primer producto del arreglo
+          setProduct(data); // ✅ Asegúrate de que se esté obteniendo el primer producto del arreglo
         }
       })
       .catch(() => router.push("/404"));
