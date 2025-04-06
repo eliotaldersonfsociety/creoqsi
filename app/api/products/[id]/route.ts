@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         .from(products)
         .where(eq(products.id, Number(id)))
         .limit(1);
+      console.log("Producto obtenido de la base de datos:", product); // Log para verificar el producto obtenido
 
       if (!product.length) {
         // Si no se encuentra el producto, devuelve arreglo vacío con status 404
