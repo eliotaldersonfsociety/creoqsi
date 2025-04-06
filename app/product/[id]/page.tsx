@@ -37,7 +37,7 @@ export default function ProductPage() {
       return;
     }
 
-    fetch(`/api/product/{params.id}`)
+    fetch(`/api/product/${params.id}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Producto recibido:", data);
