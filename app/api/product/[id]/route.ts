@@ -12,8 +12,9 @@ const db = drizzle(
   })
 );
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(request: NextRequest) {
+  const urlParts = request.nextUrl.pathname.split("/");
+  const id = urlParts[urlParts.length - 1];
 
   console.log("❤️ ID recibido en la solicitud:", id);
 
@@ -52,7 +53,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: "Error al obtener producto" }, { status: 500 });
   }
 }
-
 
 // 🔹 PUT: Actualizar un producto por ID
 export async function PUT(request: NextRequest) {
