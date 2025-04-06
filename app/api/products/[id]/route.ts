@@ -41,21 +41,7 @@ export async function GET(request: NextRequest) {
           : [],
       };
 
-      return NextResponse.json([formattedProduct]);
-    }
-
-    // Si no se especifica "id", se obtienen TODOS los productos
-    const allProducts = await db.select().from(products);
-    const formattedProducts = allProducts.map((product) => ({
-      ...product,
-      images: product.images
-        ? Array.isArray(product.images)
-          ? product.images
-          : JSON.parse(product.images)
-        : [],
-    }));
-
-    return NextResponse.json(formattedProducts);
+    return NextResponse.json([formattedProducts]);
   } catch (error) {
     console.error("Error al obtener producto(s):", error);
     return NextResponse.json({ error: "Error al obtener producto(s)" }, { status: 500 });
