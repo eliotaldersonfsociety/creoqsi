@@ -16,35 +16,38 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
+  console.log("ID recibido en la solicitud:", id); // Log para verificar el ID recibido
+
   try {
-    // Si se envía "id", se obtiene ese producto y se devuelve envuelto en un arreglo
     if (id) {
       const product = await db
         .select()
         .from(products)
         .where(eq(products.id, Number(id)))
         .limit(1);
+
       console.log("Producto obtenido de la base de datos:", product); // Log para verificar el producto obtenido
 
-      if (!product.length) {
-        // Si no se encuentra el producto, devuelve arreglo vacío con status 404
-        return NextResponse.json([], { status: 404 });
+      if (product.length === 0) {
+        return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
       }
 
-      const prod = product[0];
       const formattedProduct = {
-        ...prod,
-        images: prod.images
-          ? Array.isArray(prod.images)
-            ? prod.images
-            : JSON.parse(prod.images)
+        ...product[0],
+        images: product[0].images
+          ? Array.isArray(product[0].images)
+            ? product[0].images
+            : JSON.parse(product[0].images)
           : [],
       };
 
-    return NextResponse.json([formattedProducts]);
+      return NextResponse.json(formattedProduct); // Devuelve solo el producto solicitado
+    }
+
+    return NextResponse.json({ error: "ID de producto no proporcionado" }, { status: 400 });
   } catch (error) {
-    console.error("Error al obtener producto(s):", error);
-    return NextResponse.json({ error: "Error al obtener producto(s)" }, { status: 500 });
+    console.error("Error al obtener producto:", error);
+    return NextResponse.json({ error: "Error al obtener producto" }, { status: 500 });
   }
 }
 
