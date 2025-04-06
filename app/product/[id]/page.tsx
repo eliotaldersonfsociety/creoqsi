@@ -1,53 +1,55 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useRouter, useParams } from "next/navigation"
-import ProductDisplay from "./product-display"
+import { useEffect, useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import ProductDisplay from "./product-display";
 
 interface Product {
-  id: number
-  title: string
-  description: string
-  price: number
-  compareAtPrice?: number
-  costPerItem?: number
-  vendor?: string
-  productType?: string
-  status?: boolean
-  category?: string
-  tags?: string
-  sku?: string
-  barcode?: string
-  quantity?: number
-  trackInventory?: boolean
-  images: string[]
-  sizes?: string[]
-  sizeRange?: { min: number; max: number }
-  colors?: string[]
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number;
+  costPerItem?: number;
+  vendor?: string;
+  productType?: string;
+  status?: boolean;
+  category?: string;
+  tags?: string;
+  sku?: string;
+  barcode?: string;
+  quantity?: number;
+  trackInventory?: boolean;
+  images: string[];
+  sizes?: string[];
+  sizeRange?: { min: number; max: number };
+  colors?: string[];
 }
+
 export default function ProductPage() {
-  const [product, setProduct] = useState<Product | null>(null)
-  const router = useRouter()
-  const params = useParams() // ✅ Obtiene los parámetros de la URL
+  const [product, setProduct] = useState<Product | null>(null);
+  const router = useRouter();
+  const params = useParams(); // ✅ Obtiene los parámetros de la URL
 
   useEffect(() => {
     console.log("Product ID from URL:", params.id);
     if (!params.id) {
-      router.push("/404")
-      return
+      router.push("/404");
+      return;
     }
 
     fetch(`/api/products?id=${params.id}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Producto recibido:", data)
-        if (!data) router.push("/404")
-        else setProduct(data)
+        console.log("Producto recibido:", data);
+        if (data.length === 0) {
+          router.push("/404");
+        } else {
+          setProduct(data[0]); // ✅ Ajusta aquí para obtener el primer producto del arreglo
+        }
       })
-      .catch(() => router.push("/404"))
-  }, [params.id, router])
+      .catch(() => router.push("/404"));
+  }, [params.id, router]);
 
-  if (!product) return <p>Cargando...</p>
+  if (!product) return <p>Cargando...</p>;
 
-  return <ProductDisplay product={product} />
+  return <ProductDisplay product={product} />;
 }
