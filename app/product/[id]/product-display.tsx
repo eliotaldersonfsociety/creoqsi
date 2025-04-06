@@ -1,70 +1,68 @@
-"use client"
+import Image from "next/image";
+import { Minus, Plus, ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield } from "lucide-react";
+import { useState } from "react";
 
-import Image from "next/image"
-import { Minus, Plus, ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield } from "lucide-react"
-import { useState } from "react"
-
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface Product {
-  id: number
-  title: string
-  description: string
-  price: number
-  compareAtPrice?: number
-  costPerItem?: number
-  vendor?: string
-  productType?: string
-  status?: boolean
-  category?: string
-  tags?: string
-  sku?: string
-  barcode?: string
-  quantity?: number
-  trackInventory?: boolean
-  images: string[]
-  sizes?: string[]
-  sizeRange?: { min: number; max: number }
-  colors?: string[]
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  compareAtPrice?: number;
+  costPerItem?: number;
+  vendor?: string;
+  productType?: string;
+  status?: boolean;
+  category?: string;
+  tags?: string;
+  sku?: string;
+  barcode?: string;
+  quantity?: number;
+  trackInventory?: boolean;
+  images: string[];
+  sizes?: string[];
+  sizeRange?: { min: number; max: number };
+  colors?: string[];
 }
 
 const customLoader = ({ src, width, quality }: { src: string; width: number; quality?: number }) => {
-  return `${src}?w=${width}&q=${quality || 75}`
-}
+  return `${src}?w=${width}&q=${quality || 75}`;
+};
 
-const getRandomRating = () => parseFloat((Math.random() * (5 - 3.8) + 3.8).toFixed(1))
-const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23
+const getRandomRating = () => parseFloat((Math.random() * (5 - 3.8) + 3.8).toFixed(1));
+const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23;
 
 export default function ProductDisplay({ product }: { product: Product }) {
   console.log("Product Data:", product); // Add this line
 
-// Check if product is undefined or null
+  // Check if product is undefined or null
   if (!product) {
     return <div>Product not found.</div>;
   }
-  
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [quantity, setQuantity] = useState(1)
+
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const discountPercentage = product.compareAtPrice
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
-    : 0
+    : 0;
 
-  const rating = getRandomRating()
-  const fullStars = Math.floor(rating)
-  const hasHalfStar = rating % 1 >= 0.5
+  const rating = getRandomRating();
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
 
-  const increaseQuantity = () => setQuantity((prev) => prev + 1)
-  const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))
+  const increaseQuantity = () => setQuantity((prev) => prev + 1);
+  const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  console.log("Product Title:", product.title)
-  console.log("Images:", product.images)
-  console.log("Price:", product.price)
+  console.log("Product Title:", product.title);
+  console.log("Images:", product.images);
+  console.log("Price:", product.price);
 
   if (!product || !product.title || !product.images || product.price === undefined) {
     return <div>Loading...</div>; // or some fallback UI
@@ -183,7 +181,6 @@ export default function ProductDisplay({ product }: { product: Product }) {
               )}
             </div>
 
-
             <div className="flex items-center gap-2">
               {product.status ? (
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -249,7 +246,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
               )}
 
               {product.sizeRange && (() => {
-                const { min, max } = product.sizeRange
+                const { min, max } = product.sizeRange;
                 return (
                   <div className="space-y-2">
                     <Label htmlFor="sizeRange" className="text-base">Size Range</Label>
@@ -269,7 +266,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                       ))}
                     </RadioGroup>
                   </div>
-                )
+                );
               })()}
 
               {product.colors && product.colors.length > 0 && (
@@ -340,11 +337,11 @@ export default function ProductDisplay({ product }: { product: Product }) {
               <TabsTrigger value="details">Details</TabsTrigger>
               <TabsTrigger value="shipping">Shipping</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="description" className="pt-4">
               <p>{product.description}</p>
             </TabsContent>
-            
+
             <TabsContent value="details" className="pt-4">
               <ul className="space-y-2">
                 <li className="flex justify-between py-1 border-b">
@@ -371,7 +368,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                   <span className="font-medium">Barcode</span>
                   <span>{product.barcode || "N/A"}</span>
                 </li>
-                {product.tags && (
+                {product.tags && typeof product.tags === 'string' && (
                   <li className="flex justify-between py-1 border-b">
                     <span className="font-medium">Tags</span>
                     <div className="flex flex-wrap gap-1 justify-end">
@@ -385,7 +382,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                 )}
               </ul>
             </TabsContent>
-            
+
             <TabsContent value="shipping" className="pt-4">
               <div className="space-y-4">
                 <p>Free shipping on orders over $50. Standard delivery 3-5 business days.</p>
@@ -397,5 +394,5 @@ export default function ProductDisplay({ product }: { product: Product }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
