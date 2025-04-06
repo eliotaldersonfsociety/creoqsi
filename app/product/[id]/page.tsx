@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import ProductDisplay from "./product-display";
@@ -44,7 +43,7 @@ export default function ProductPage() {
         if (data.length === 0) {
           router.push("/404");
         } else {
-          setProduct(data[0]); // ✅ Ajusta aquí para obtener el primer producto del arreglo
+          setProduct(data[0]); // ✅ Asegúrate de que se esté obteniendo el primer producto del arreglo
         }
       })
       .catch(() => router.push("/404"));
