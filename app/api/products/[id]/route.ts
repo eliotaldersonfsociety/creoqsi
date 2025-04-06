@@ -11,56 +11,57 @@ const db = drizzle(
   })
 );
 
-// 🔹 Obtener un producto por ID
+// 🔹 GET: Obtener producto(s)
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
-  console.log("ID recibido en la solicitud:", id); // Verifica el ID recibido
-
-  if (!id) {
-    return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
-  }
-
   try {
-    const product = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, Number(id)))
-      .limit(1);
+    // Si se envía "id", se obtiene ese producto y se devuelve envuelto en un arreglo
+    if (id) {
+      const product = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, Number(id)))
+        .limit(1);
 
-    console.log("Producto obtenido de la base de datos:", product); // Verifica el producto obtenido
+      if (!product.length) {
+        // Si no se encuentra el producto, devuelve arreglo vacío con status 404
+        return NextResponse.json([], { status: 404 });
+      }
 
-    if (!product.length) {
-      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+      const prod = product[0];
+      const formattedProduct = {
+        ...prod,
+        images: prod.images
+          ? Array.isArray(prod.images)
+            ? prod.images
+            : JSON.parse(prod.images)
+          : [],
+      };
+
+      return NextResponse.json([formattedProduct]);
     }
 
-    const prod = product[0];
-
-    console.log("Producto a enviar en la respuesta:", {
-      ...prod,
-      images: prod.images
-        ? Array.isArray(prod.images)
-          ? prod.images
-          : JSON.parse(prod.images)
+    // Si no se especifica "id", se obtienen TODOS los productos
+    const allProducts = await db.select().from(products);
+    const formattedProducts = allProducts.map((product) => ({
+      ...product,
+      images: product.images
+        ? Array.isArray(product.images)
+          ? product.images
+          : JSON.parse(product.images)
         : [],
-    }); // Verifica el producto que se enviará en la respuesta
+    }));
 
-    return NextResponse.json({
-      ...prod,
-      images: prod.images
-        ? Array.isArray(prod.images)
-          ? prod.images
-          : JSON.parse(prod.images)
-        : [],
-    });
+    return NextResponse.json(formattedProducts);
   } catch (error) {
-    console.error("Error al obtener producto:", error);
-    return NextResponse.json({ error: "Error al obtener producto" }, { status: 500 });
+    console.error("Error al obtener producto(s):", error);
+    return NextResponse.json({ error: "Error al obtener producto(s)" }, { status: 500 });
   }
 }
 
-// 🔹 Actualizar un producto por ID
+// 🔹 PUT: Actualizar un producto por ID
 export async function PUT(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -84,7 +85,7 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// 🔹 Eliminar un producto por ID
+// 🔹 DELETE: Eliminar un producto por ID
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -114,7 +115,7 @@ export async function DELETE(request: NextRequest) {
       deletedId: productId,
     });
   } catch (error) {
-    console.error("Error en DELETE /api/products/[id]:", error);
+    console.error("Error al eliminar producto:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
