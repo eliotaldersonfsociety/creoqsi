@@ -21,7 +21,7 @@ export default function DeleteButton({ id, className }: DeleteButtonProps) {
       const numericId = Number(id);
       if (isNaN(numericId)) throw new Error("ID numérico inválido");
 
-      const res = await fetch(`/api/products/${numericId}`, {
+      const res = await fetch(`/api/product/${numericId}`, {
         method: "DELETE",
       });
 
