@@ -1,5 +1,3 @@
-"use client"
-
 import Image from "next/image"
 import { ShoppingCartIcon as CartIcon, Plus, Minus } from "lucide-react"
 
@@ -73,7 +71,8 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
             ))
           )}
         </div>
-        {cartItems.length > 0 && (
+        {/* Fixed conditional rendering */}
+        {cartItems.length > 0 ? (
           <div className="mt-6 pt-6 border-t">
             <div className="flex justify-between font-medium">
               <span>Total</span>
@@ -88,7 +87,7 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
               <Button className="w-full">Checkout</Button>
             </SheetFooter>
           </div>
-        )}
+        ) : null}
       </SheetContent>
     </Sheet>
   )
