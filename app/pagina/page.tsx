@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import Header from "@/components/header/page"
 
 interface Product {
   id: number
@@ -38,6 +39,8 @@ export default function ProductGrid() {
   if (loading) return <p className="text-center py-10">Cargando productos...</p>
 
   return (
+    <>
+      <Header />
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Lista de Productos</h1>
 
@@ -84,5 +87,6 @@ export default function ProductGrid() {
         ))}
       </div>
     </div>
+    </>
   )
 }
