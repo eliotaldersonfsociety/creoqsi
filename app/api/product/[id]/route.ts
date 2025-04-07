@@ -96,35 +96,44 @@ export async function PUT(request: NextRequest) {
 
 // 🔹 DELETE: Eliminar un producto por ID
 export async function DELETE(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const urlParts = request.nextUrl.pathname.split("/");
+  const id = urlParts[urlParts.length - 1];
 
-  if (!id || !/^\d+$/.test(id)) {
-    return NextResponse.json({ error: "ID de producto inválido o faltante" }, { status: 400 });
-  }
-
-  const productId = parseInt(id, 10);
+  console.log("🗑️ ID recibido en la solicitud DELETE:", id);
 
   try {
-    const [product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.id, productId))
-      .limit(1);
+    if (id && !isNaN(Number(id))) {
+      const productId = parseInt(id, 10);
+      console.log("✅ ID convertido a número:", productId);
 
-    if (!product) {
-      return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+      const [product] = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, productId))
+        .limit(1);
+
+      console.log("🔍 Producto encontrado antes de eliminar:", product);
+
+      if (!product) {
+        console.warn("⚠️ Producto no encontrado para eliminar");
+        return NextResponse.json({ error: "Producto no encontrado" }, { status: 404 });
+      }
+
+      await db.delete(products).where(eq(products.id, productId));
+
+      console.log("🧹 Producto eliminado exitosamente");
+
+      return NextResponse.json({
+        success: true,
+        message: "Producto eliminado exitosamente",
+        deletedId: productId,
+      });
     }
 
-    await db.delete(products).where(eq(products.id, productId));
-
-    return NextResponse.json({
-      success: true,
-      message: "Producto eliminado exitosamente",
-      deletedId: productId,
-    });
+    console.warn("⚠️ ID de producto no proporcionado o inválido");
+    return NextResponse.json({ error: "ID de producto no proporcionado o inválido" }, { status: 400 });
   } catch (error) {
-    console.error("Error al eliminar producto:", error);
+    console.error("💥 Error al eliminar producto:", error);
     return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }
