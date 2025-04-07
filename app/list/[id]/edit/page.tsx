@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import ProductForm from "@/app/list/_components/product-form";
 
 async function getProduct(id: string) {
-  const res = await fetch(`http://localhost:3000/api/products?id=${id}`, {
+  const res = await fetch(`https://creoqsi-one.vercel.app/api/product/${id}`, {
     cache: "no-store",
   });
 
@@ -39,7 +39,7 @@ export default function EditProduct() {
   return (
     <div className="container mx-auto py-8">
       <div className="flex items-center gap-4 mb-6">
-        <Link href={`/products/${id}`}>
+        <Link href={`/product/${id}`}>
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
           </Button>
