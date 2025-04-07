@@ -74,7 +74,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     productType: initialData?.productType || "",
     status: initialData?.status ?? 0,
     category: initialData?.category || "",
-    tags: initialData?.tags?.join(", ") || "",
+    tags: Array.isArray(initialData?.tags) ? initialData.tags.join(", ") : "",
     sku: initialData?.sku || "",
     barcode: initialData?.barcode || "",
     quantity: initialData?.quantity?.toString() || "",
@@ -146,7 +146,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
     try {
       const productId = initialData?.id || id
       const isEditing = !!productId
-      const url = isEditing ? `/api/products/${productId}` : "/api/products"
+      const url = isEditing ? `/api/product/${productId}` : "/api/product"
       const method = isEditing ? "PUT" : "POST"
 
       const numericFields = {
@@ -187,7 +187,7 @@ export default function ProductForm({ initialData, id }: ProductFormProps) {
         throw new Error(errorData.error || "Error guardando producto")
       }
 
-      router.push("/products")
+      router.push("/list")
       router.refresh()
     } catch (error) {
       console.error("Error:", error)
