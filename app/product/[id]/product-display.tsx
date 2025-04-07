@@ -231,7 +231,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                     Size
                   </Label>
                   <RadioGroup defaultValue={product.sizes[0]} className="flex flex-wrap items-center gap-2">
-                    {Array.isArray(product.sizes) && product.sizes.length > 0 && (
+                    {product.sizes.map((size) => (
                       <Label
                         key={size}
                         htmlFor={`size-${size}`}
