@@ -55,12 +55,11 @@ export async function GET(request: NextRequest) {
 }
 
 // 🔹 PUT: Actualizar un producto por ID
-export async function PUT(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = params;
 
-  if (!id) {
-    return NextResponse.json({ error: "ID del producto es requerido" }, { status: 400 });
+  if (!id || isNaN(Number(id))) {
+    return NextResponse.json({ error: "ID del producto inválido o faltante" }, { status: 400 });
   }
 
   try {
