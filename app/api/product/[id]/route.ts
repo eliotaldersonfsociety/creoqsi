@@ -55,25 +55,42 @@ export async function GET(request: NextRequest) {
 }
 
 // 🔹 PUT: Actualizar un producto por ID
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PUT(request: NextRequest) {
+  const urlParts = request.nextUrl.pathname.split("/");
+  const id = urlParts[urlParts.length - 1];
 
-  if (!id || isNaN(Number(id))) {
-    return NextResponse.json({ error: "ID del producto inválido o faltante" }, { status: 400 });
-  }
+  console.log("🛠️ ID recibido en la solicitud PUT:", id);
 
   try {
-    const body = await request.json();
+    if (id && !isNaN(Number(id))) {
+      const numericId = parseInt(id, 10);
+      console.log("✅ ID convertido a número:", numericId);
 
-    await db
-      .update(products)
-      .set({ ...body, images: JSON.stringify(body.images) })
-      .where(eq(products.id, Number(id)));
+      const body = await request.json();
 
-    return NextResponse.json({ message: "Producto actualizado correctamente" });
+      const updatedData = {
+        ...body,
+        images: Array.isArray(body.images) ? JSON.stringify(body.images) : "[]",
+      };
+
+      const result = await db
+        .update(products)
+        .set(updatedData)
+        .where(eq(products.id, numericId));
+
+      console.log("✅ Producto actualizado:", result);
+
+      return NextResponse.json({ message: "Producto actualizado correctamente" });
+    }
+
+    console.warn("⚠️ ID de producto no proporcionado o inválido");
+    return NextResponse.json({ error: "ID de producto no proporcionado o inválido" }, { status: 400 });
   } catch (error) {
-    console.error("Error al actualizar producto:", error);
-    return NextResponse.json({ error: "Error al actualizar producto" }, { status: 500 });
+    console.error("💥 Error al actualizar producto:", error);
+    return NextResponse.json(
+      { error: "Error al actualizar producto", details: (error as Error).message },
+      { status: 500 }
+    );
   }
 }
 
