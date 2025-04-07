@@ -41,7 +41,6 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
         <SheetHeader>
           <SheetTitle>Your Cart</SheetTitle>
         </SheetHeader>
-
         <div className="mt-6 flex flex-col gap-5">
           {cartItems.length === 0 ? (
             <p className="text-center text-muted-foreground py-6">Your cart is empty</p>
@@ -74,7 +73,6 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
             ))
           )}
         </div>
-
         {cartItems.length > 0 && (
           <div className="mt-6 pt-6 border-t">
             <div className="flex justify-between font-medium">
@@ -92,8 +90,6 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
           </div>
         )}
       </SheetContent>
-
     </Sheet>
   )
 }
-
