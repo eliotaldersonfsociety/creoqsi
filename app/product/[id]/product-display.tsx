@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Minus, Plus, ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield } from "lucide-react";
 import { useState } from "react";
-import Ofert from "@/components/ofert/page";
+import Ofert from "@/components/oferta/page";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -94,7 +94,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
                     Save {discountPercentage}%
                   </Badge>
                 )}
-                <Ofert />
+  
               </div>
               {product.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
@@ -129,6 +129,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
               />
             </div>
           )}
+          <Ofert />
         </div>
 
         <div className="flex flex-col space-y-6">
