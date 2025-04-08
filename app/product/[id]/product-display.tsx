@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Header from "@/components/header/page"
+import Header from "@/components/header/page";
+import Footer from "@/components/footer/page";
 
 interface Product {
   id: number;
@@ -399,6 +400,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
         </div>
       </div>
     </div>
+    <Footer/>
     </>
   );
 }
