@@ -1,8 +1,8 @@
-import Image from "next/image"
-import { ShoppingCartIcon as CartIcon, Plus, Minus } from "lucide-react"
-
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+import { ShoppingCartIcon as CartIcon, Plus, Minus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -11,17 +11,12 @@ import {
   SheetTrigger,
   SheetFooter,
   SheetClose,
-} from "@/components/ui/sheet"
-import type { CartItem } from "@/components/header/page"
+} from "@/components/ui/sheet";
 
-interface ShoppingCartProps {
-  cartItems: CartItem[]
-  addToCart: (productId: number) => void
-  removeFromCart: (productId: number) => void
-}
+export default function ShoppingCart() {
+  const { cartItems, addToCart, removeFromCart } = useCart();
 
-export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: ShoppingCartProps) {
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <Sheet>
@@ -36,12 +31,10 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
         </Button>
       </SheetTrigger>
 
-      {/* Fixed SheetContent with proper props structure */}
       <SheetContent>
         <SheetHeader className="border-b pb-4">
           <SheetTitle>Your Cart</SheetTitle>
         </SheetHeader>
-
         <div className="py-4 h-[calc(100vh-180px)] overflow-y-auto">
           {cartItems.length === 0 ? (
             <p className="text-center text-muted-foreground py-6">Your cart is empty</p>
@@ -75,7 +68,7 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
                     variant="outline"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => addToCart(item.id)}
+                    onClick={() => addToCart(item)}
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
@@ -84,7 +77,6 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
             ))
           )}
         </div>
-
         {cartItems.length > 0 && (
           <div className="border-t pt-4">
             <div className="flex justify-between font-medium mb-4">
@@ -103,5 +95,5 @@ export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: S
         )}
       </SheetContent>
     </Sheet>
-  )
+  );
 }
