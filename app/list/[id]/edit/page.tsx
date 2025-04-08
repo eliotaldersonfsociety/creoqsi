@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductForm from "@/app/list/_components/product-form";
+import { SVGCartLoader } from "@/components/loader/page";
 
 async function getProduct(id: string) {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -34,7 +35,10 @@ export default function EditProduct() {
     }
   }, [id]);
 
-  if (loading) return <p>Cargando...</p>;
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <SVGCartLoader />
+    </div>
   if (!product) return <p>Producto no encontrado</p>;
 
   return (
