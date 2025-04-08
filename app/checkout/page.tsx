@@ -409,7 +409,7 @@ function Lock() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M19 11H5C3.89543 11 11 3 11 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 19.1046 11 19 11.8954 19 13V20V13C19 11.8954 20.1046 11 21 11H5V5H19V11Z"
+        d="M19 11H5C3.89543 11 11 3 11 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
