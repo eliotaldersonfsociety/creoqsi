@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import ProductForm from "@/app/list/_components/product-form";
 
 async function getProduct(id: string) {
-  const res = await fetch(`https://creoqsi-one.vercel.app/api/product/${id}`, {
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const res = await fetch(`${baseUrl}/api/product/${id}`, {
     cache: "no-store",
   });
 
