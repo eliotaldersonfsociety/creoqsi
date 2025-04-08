@@ -1,26 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { ChevronDown, HelpCircle, Info, Minus, Plus, X } from "lucide-react"
+import { useState } from "react";
+import Image from "next/image";
+import { ChevronDown, HelpCircle, Info, Minus, Plus, X } from "lucide-react";
+import { useCart } from "@/context/cart-context";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { CartItem } from "@/components/header/page"
-
-interface CheckoutPageProps {
-  cartItems: CartItem[];
-}
-
-export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
-  const [paymentMethod, setPaymentMethod] = useState<"credit-card" | "payu">("credit-card")
-  const [tipAmount, setTipAmount] = useState<string | null>(null)
+export default function CheckoutPage() {
+  const { cartItems } = useCart();
+  const [paymentMethod, setPaymentMethod] = useState<"credit-card" | "payu">("credit-card");
+  const [tipAmount, setTipAmount] = useState<string | null>(null);
 
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const tax = totalPrice * 0.19; // 19% de impuestos
+  const grandTotal = totalPrice + tax;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -66,7 +64,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                   <SelectValue placeholder="País / Región" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem></SelectItem>
+                  <SelectItem value="colombia">Colombia</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -90,7 +88,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
               <Label htmlFor="address" className="sr-only">
                 Dirección
               </Label>
-              <Input id="address" placeholder="Dirección" />
+                <Input id="address" placeholder="Dirección" />
             </div>
 
             <div>
@@ -116,7 +114,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                     <SelectValue placeholder="Provincia / Estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem></SelectItem>
+                    <SelectItem value="bogota">Bogotá D.C.</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -352,30 +350,35 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
       {/* Right side - Order summary */}
       <div className="lg:w-2/5 bg-gray-100 p-4 md:p-8">
         <div className="max-w-md mx-auto">
-          <div className="flex items-start gap-4 border-b pb-6 mb-6">
-            <div className="relative">
-              <div className="w-16 h-16 bg-white rounded border flex items-center justify-center">
-                <Image src="/placeholder.svg?height=60&width=60" alt="Laptop" width={60} height={60} />
+          {cartItems.map((item) => (
+            <div key={item.id} className="flex items-start gap-4 border-b pb-6 mb-6">
+              <div className="relative">
+                <div className="w-16 h-16 bg-white rounded border flex items-center justify-center">
+                  <Image
+                    src={typeof item.image === 'string' ? item.image : item.image[0]}
+                    alt={item.name}
+                    width={60}
+                    height={60}
+                    className="object-cover"
+                  />
+                </div>
+                <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs">
+                  {item.quantity}
+                </div>
               </div>
-              <div className="absolute -top-2 -right-2 w-5 h-5 bg-gray-500 rounded-full flex items-center justify-center text-white text-xs">
-                1
+              <div className="flex-1">
+                <p className="font-medium">{item.name}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
               </div>
             </div>
-            <div className="flex-1">
-              <p className="font-medium">
-                Portátil L15 con pantalla táctil IPS de 360 pulgadas, Tablet 2 en 1 con Intel N95, 10,5
-                °, Windows 11, para oficina
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">$200.000,00</p>
-            </div>
-          </div>
+          ))}
 
           <div className="space-y-2 border-b pb-6 mb-6">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>$200.000,00</span>
+              <span>${totalPrice.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Envío</span>
@@ -386,7 +389,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                 <span>Impuestos estimados</span>
                 <Info className="h-4 w-4 text-gray-400" />
               </div>
-              <span>$38.000,00</span>
+              <span>${tax.toFixed(2)}</span>
             </div>
           </div>
 
@@ -394,7 +397,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
             <span>Total</span>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">COP</span>
-              <span>${(totalPrice + 38).toFixed(2)}</span>
+              <span>${grandTotal.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -415,11 +418,3 @@ function Lock() {
       />
       <path
         d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92143 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
