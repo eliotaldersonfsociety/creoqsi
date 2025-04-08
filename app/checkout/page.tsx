@@ -10,10 +10,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { CartItem } from "@/components/header/page"
 
-export default function CheckoutPage() {
+interface CheckoutPageProps {
+  cartItems: CartItem[];
+}
+
+export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
   const [paymentMethod, setPaymentMethod] = useState<"credit-card" | "payu">("credit-card")
   const [tipAmount, setTipAmount] = useState<string | null>(null)
+
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -288,7 +295,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("10")}
                 >
                   <span>10%</span>
-                  <span className="text-xs">$20.000,00</span>
+                  <span className="text-xs">${(totalPrice * 0.10).toFixed(2)}</span>
                 </Button>
                 <Button
                   variant={tipAmount === "15" ? "default" : "outline"}
@@ -296,7 +303,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("15")}
                 >
                   <span>15%</span>
-                  <span className="text-xs">$30.000,00</span>
+                  <span className="text-xs">${(totalPrice * 0.15).toFixed(2)}</span>
                 </Button>
                 <Button
                   variant={tipAmount === "20" ? "default" : "outline"}
@@ -304,7 +311,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("20")}
                 >
                   <span>20%</span>
-                  <span className="text-xs">$40.000,00</span>
+                  <span className="text-xs">${(totalPrice * 0.20).toFixed(2)}</span>
                 </Button>
                 <Button
                   variant={tipAmount === "none" ? "default" : "outline"}
@@ -370,7 +377,7 @@ export default function CheckoutPage() {
           <div className="space-y-2 border-b pb-6 mb-6">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>$200.000,00</span>
+              <span>${totalPrice.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Envío</span>
@@ -389,32 +396,32 @@ export default function CheckoutPage() {
             <span>Total</span>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">COP</span>
-              <span>$238.000,00</span>
+              <span>${(totalPrice + 38).toFixed(2)}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function Lock() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
-        d="M19 11H5C3.89543 11 3 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 20.1046 11 19 11Z"
+        d="M19 11H5C3.89543 11 11 3 11 11.8954 3 13V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V13C21 11.8954 19.1046 11 19 11.8954 19 13V20V13C19 11.8954 20.1046 11 21 11H5V5H19V11Z"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92172 3.42143 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11"
+        d="M7 11V7C7 5.93913 7.42143 4.92172 8.17157 4.17157C8.92143 3.42172 9.93913 3 11 3H13C14.0609 3 15.0783 3.42143 15.8284 4.17157C16.5786 4.92172 17 5.93913 17 7V11"
         stroke="currentColor"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
     </svg>
-  )
+  );
 }
