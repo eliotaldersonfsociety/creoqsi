@@ -3,7 +3,6 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
-import Header from "@/components/header/page"
 import HeroBanner from "@/components/hero/page"
 import { SVGCartLoader } from "@/components/loader/page"
 
