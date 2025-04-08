@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, useContext, useState, ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import Cookies from "js-cookie"
 
 interface CartItem {
   id: number
@@ -21,6 +22,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
 
+  useEffect(() => {
+    const savedCart = Cookies.get("cart")
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart))
+    }
+  }, [])
+
+  useEffect(() => {
+    Cookies.set("cart", JSON.stringify(cartItems), { expires: 7 })
+  }, [cartItems])
+
   const addToCart = (product: CartItem) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id)
@@ -34,7 +46,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         return [...prevItems, { ...product, quantity: 1 }]
       }
     })
-    console.log("🛒 Producto agregado:", product)
   }
 
   const removeFromCart = (productId: number) => {
@@ -55,13 +66,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <CartContext.Provider value={{ addToCart, removeFromCart, cartItems }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
       {children}
     </CartContext.Provider>
   )
 }
 
-// ✅ Este hook es lo que falta para que tu import en hot-products-banner.tsx funcione
 export const useCart = () => {
   const context = useContext(CartContext)
   if (context === undefined) {
