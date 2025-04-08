@@ -56,16 +56,14 @@ export default function ShoppingCart({
               return (
                 <div key={item.id} className="flex items-center gap-4 mb-4">
                   <Image
-                    src={
-                      Array.isArray(item.image)
-                        ? item.image[0]
-                        : item.image || "/placeholder.svg"
-                    }
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    className="rounded-md object-cover"
-                  />
+                  loader={({ src }) => src}
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.name}
+                  width={80}
+                  height={80}
+                  unoptimized
+                  className="rounded-md object-cover"
+                />
                   <div className="flex-1">
                     <h4 className="font-medium">{item.name}</h4>
                     <p className="text-sm text-muted-foreground">
