@@ -174,7 +174,7 @@ export default function CheckoutPage() {
           <div className="border rounded-md mb-8">
             <div className="p-4 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <RadioGroupItem id="standard" value="standard" checked readOnly />
+                <RadioGroupItem id="standard" value="standard" />
                 <Label htmlFor="standard">Standard</Label>
               </div>
               <span className="font-medium">Gratis</span>
@@ -256,7 +256,7 @@ export default function CheckoutPage() {
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem id="payu" value="payu" />
-                <Label htmlFor="payu">A través de PayU: Tarjetas crédito y más</Label>
+                <Label htmlFor="payu">A través de PayU: Tarjetas de crédito y más</Label>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-8 h-5 bg-blue-600 rounded"></div>
