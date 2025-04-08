@@ -355,6 +355,7 @@ export default function CheckoutPage() {
               <div className="relative">
                 <div className="w-16 h-16 bg-white rounded border flex items-center justify-center">
                   <Image
+                    loader={({ src }) => src}
                     src={typeof item.image === 'string' ? item.image : item.image[0]}
                     alt={item.name}
                     width={60}
