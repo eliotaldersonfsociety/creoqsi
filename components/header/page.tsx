@@ -12,6 +12,14 @@ import HotProductsBanner from "@/components/header/hot-products-banner"
 import OffersBanner from "@/components/header/offers-banner"
 import { useCart } from "@/context/CartContext"
 
+export type CartItem = {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+};
+
 export default function Header() {
   const { cartItems, addToCart, removeFromCart } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
