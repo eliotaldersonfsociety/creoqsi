@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import Header from "@/components/header/page"
+import HeroBanner from "@/components/hero/page"
 
 interface Product {
   id: number
@@ -41,6 +42,7 @@ export default function ProductGrid() {
   return (
     <>
       <Header />
+      <HeroBanner />
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Lista de Productos</h1>
 
