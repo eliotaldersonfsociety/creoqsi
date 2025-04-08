@@ -43,9 +43,16 @@ export default function ShoppingCart({
       </SheetTrigger>
 
       <SheetContent>
-        <SheetHeader className="border-b pb-4">
-          <SheetTitle>Your Cart</SheetTitle>
+        <SheetHeader>
+          <Image
+            src="/tsn.png
+            alt="Carrito"
+            width={120}
+            height={40}
+            className="mx-auto"
+          />
         </SheetHeader>
+
         <div className="py-4 h-[calc(100vh-180px)] overflow-y-auto">
           {cartItems.length === 0 ? (
             <p className="text-center text-muted-foreground py-6">Your cart is empty</p>
