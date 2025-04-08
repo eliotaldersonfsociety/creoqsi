@@ -1,3 +1,4 @@
+import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import { Minus, Plus, ShoppingCart, Heart, Share2, Truck, RotateCcw, Shield } from "lucide-react";
 import { useState } from "react";
@@ -39,12 +40,7 @@ const getRandomRating = () => parseFloat((Math.random() * (5 - 3.8) + 3.8).toFix
 const getRandomReviews = () => Math.floor(Math.random() * (107 - 23 + 1)) + 23;
 
 export default function ProductDisplay({ product }: { product: Product }) {
-  console.log("Product Data:", product); // Add this line
-
-  // Check if product is undefined or null
-  if (!product) {
-    return <div>Product not found.</div>;
-  }
+  const { addToCart } = useCart();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -60,9 +56,15 @@ export default function ProductDisplay({ product }: { product: Product }) {
   const increaseQuantity = () => setQuantity((prev) => prev + 1);
   const decreaseQuantity = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  console.log("Product Title:", product.title);
-  console.log("Images:", product.images);
-  console.log("Price:", product.price);
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.title,
+      price: product.price,
+      image: product.images[0],
+      quantity: 1,
+    });
+  };
 
   if (!product || !product.title || !product.images || product.price === undefined) {
     return <div>Loading...</div>; // or some fallback UI
@@ -94,7 +96,6 @@ export default function ProductDisplay({ product }: { product: Product }) {
                     Save {discountPercentage}%
                   </Badge>
                 )}
-  
               </div>
               {product.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
@@ -298,7 +299,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
               )}
 
               <div className="grid grid-cols-2 gap-3">
-                <Button size="lg" className="w-full">
+                <Button size="lg" className="w-full" onClick={handleAddToCart}>
                   <ShoppingCart className="mr-2 h-4 w-4" />
                   Add to Cart
                 </Button>
