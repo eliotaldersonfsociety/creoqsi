@@ -172,13 +172,15 @@ export default function CheckoutPage() {
 
           <h2 className="text-xl font-bold mb-4">Métodos de envío</h2>
           <div className="border rounded-md mb-8">
-            <div className="p-4 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <RadioGroupItem id="standard" value="standard" />
-                <Label htmlFor="standard">Standard</Label>
+            <RadioGroup defaultValue="standard">
+              <div className="p-4 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem id="standard" value="standard" />
+                  <Label htmlFor="standard">Standard</Label>
+                </div>
+                <span className="font-medium">Gratis</span>
               </div>
-              <span className="font-medium">Gratis</span>
-            </div>
+            </RadioGroup>
           </div>
 
           <h2 className="text-xl font-bold mb-4">Pago</h2>
@@ -286,7 +288,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("10")}
                 >
                   <span>10%</span>
-                  <span className="text-xs">$ 20.000,00</span>
+                  <span className="text-xs">$20.000,00</span>
                 </Button>
                 <Button
                   variant={tipAmount === "15" ? "default" : "outline"}
@@ -294,7 +296,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("15")}
                 >
                   <span>15%</span>
-                  <span className="text-xs">$ 30.000,00</span>
+                  <span className="text-xs">$30.000,00</span>
                 </Button>
                 <Button
                   variant={tipAmount === "20" ? "default" : "outline"}
@@ -302,7 +304,7 @@ export default function CheckoutPage() {
                   onClick={() => setTipAmount("20")}
                 >
                   <span>20%</span>
-                  <span className="text-xs">$ 40.000,00</span>
+                  <span className="text-xs">$40.000,00</span>
                 </Button>
                 <Button
                   variant={tipAmount === "none" ? "default" : "outline"}
@@ -356,19 +358,19 @@ export default function CheckoutPage() {
             </div>
             <div className="flex-1">
               <p className="font-medium">
-                Topton-ordenador portátil L15 con pantalla táctil IPS de 360 pulgadas, Tablet 2 en 1 con Intel N95, 10,5
+                Portátil L15 con pantalla táctil IPS de 360 pulgadas, Tablet 2 en 1 con Intel N95, 10,5
                 °, Windows 11, para oficina
               </p>
             </div>
             <div className="text-right">
-              <p className="font-medium">$ 200.000,00</p>
+              <p className="font-medium">$200.000,00</p>
             </div>
           </div>
 
           <div className="space-y-2 border-b pb-6 mb-6">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>$ 200.000,00</span>
+              <span>$200.000,00</span>
             </div>
             <div className="flex justify-between">
               <span>Envío</span>
@@ -379,7 +381,7 @@ export default function CheckoutPage() {
                 <span>Impuestos estimados</span>
                 <Info className="h-4 w-4 text-gray-400" />
               </div>
-              <span>$ 38.000,00</span>
+              <span>$38.000,00</span>
             </div>
           </div>
 
@@ -387,7 +389,7 @@ export default function CheckoutPage() {
             <span>Total</span>
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">COP</span>
-              <span>$ 238.000,00</span>
+              <span>$238.000,00</span>
             </div>
           </div>
         </div>
