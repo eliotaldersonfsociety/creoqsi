@@ -37,13 +37,12 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
 
           <div className="mb-6">
             <Label htmlFor="email" className="sr-only">
-              Email o número de teléfono móvil
+              Email
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="Email o número de teléfono móvil"
-              defaultValue="david@gmail.com"
+              placeholder="Email"
               className="w-full mb-2"
             />
 
