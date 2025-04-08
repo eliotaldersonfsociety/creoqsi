@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Header from "@/components/header/page"
 
 interface Product {
   id: number;
@@ -69,6 +70,8 @@ export default function ProductDisplay({ product }: { product: Product }) {
   }
 
   return (
+    <>
+    <Header />
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-sm text-muted-foreground mb-6">
         <span className="hover:underline cursor-pointer">Home</span> /
@@ -396,5 +399,6 @@ export default function ProductDisplay({ product }: { product: Product }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
