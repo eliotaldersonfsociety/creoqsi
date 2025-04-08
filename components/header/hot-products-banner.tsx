@@ -83,7 +83,15 @@ export default function HotProductsBanner() {
                     size="sm"
                     variant="outline"
                     className="border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white"
-                    onClick={() => addToCart(product.id)}
+                    onClick={() =>
+                    addToCart({
+                      id: product.id,
+                      name: product.title,
+                      price: product.price,
+                      image: product.images[0],
+                      quantity: 1,
+                    })
+                  }
                   >
                     Agregar
                   </Button>
