@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { ChevronDown, Flame } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ interface Product {
 }
 
 interface HotProductsBannerProps {
+  products: Product[]
   addToCart: (productId: number) => void
 }
 
@@ -21,20 +22,10 @@ function getRandomProducts<T>(array: T[], count: number): T[] {
   return array.sort(() => 0.5 - Math.random()).slice(0, count)
 }
 
-export default function HotProductsBanner({ addToCart }: HotProductsBannerProps) {
+export default function HotProductsBanner({ products, addToCart }: HotProductsBannerProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [hotProducts, setHotProducts] = useState<Product[]>([])
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const res = await fetch("/api/products")
-      const data: Product[] = await res.json()
-      const randomProducts = getRandomProducts(data, 4)
-      setHotProducts(randomProducts)
-    }
-
-    fetchProducts()
-  }, [])
+  const hotProducts = getRandomProducts(products, 4)
 
   return (
     <div className="w-full">
@@ -44,7 +35,11 @@ export default function HotProductsBanner({ addToCart }: HotProductsBannerProps)
       >
         <Flame className="h-4 w-4 mr-2 text-orange-500" />
         Lo más hot
-        <ChevronDown className={`h-4 w-4 ml-2 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown
+          className={`h-4 w-4 ml-2 transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </button>
 
       <div
@@ -55,7 +50,10 @@ export default function HotProductsBanner({ addToCart }: HotProductsBannerProps)
         <div className="container mx-auto py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {hotProducts.map((product) => (
-              <div key={product.id} className="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex flex-col">
+              <div
+                key={product.id}
+                className="bg-white/10 backdrop-blur-sm rounded-lg p-3 flex flex-col"
+              >
                 <div className="relative mb-2">
                   <Image
                     loader={({ src }) => src}
@@ -66,7 +64,9 @@ export default function HotProductsBanner({ addToCart }: HotProductsBannerProps)
                     height={120}
                     className="w-full h-auto object-cover rounded-md"
                   />
-                  <Badge className="absolute top-2 right-2 bg-orange-500">Hot</Badge>
+                  <Badge className="absolute top-2 right-2 bg-orange-500">
+                    Hot
+                  </Badge>
                 </div>
                 <h3 className="font-medium text-sm mb-1">{product.title}</h3>
                 <div className="flex items-center justify-between mt-auto">
