@@ -10,82 +10,12 @@ import ShoppingCart from "@/components/header/shopping-cart"
 import NavigationMenu from "@/components/header/navigation-menu"
 import HotProductsBanner from "@/components/header/hot-products-banner"
 import OffersBanner from "@/components/header/offers-banner"
-
-// Sample product data - moved to a shared location
-export const sampleProducts = [
-  {
-    id: 1,
-    name: "Premium Headphones",
-    price: 129.99,
-    image: "/placeholder.svg?height=80&width=80",
-  },
-  {
-    id: 2,
-    name: "Wireless Keyboard",
-    price: 59.99,
-    image: "/placeholder.svg?height=80&width=80",
-  },
-  {
-    id: 3,
-    name: "Smart Watch",
-    price: 199.99,
-    image: "/placeholder.svg?height=80&width=80",
-  },
-  {
-    id: 4,
-    name: "Bluetooth Speaker",
-    price: 89.99,
-    image: "/placeholder.svg?height=80&width=80",
-  },
-]
-
-export type CartItem = {
-  id: number
-  name: string
-  price: number
-  image: string
-  quantity: number
-}
+import { useCart } from "@/context/CartContext"
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [cartItems, setCartItems] = useState<CartItem[]>(
-    sampleProducts.slice(0, 2).map((product) => ({
-      ...product,
-      quantity: 1,
-    })),
-  )
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  // Fixed addToCart function
-  const addToCart = (productId: number) => {
-    console.log("Adding product to cart:", productId) // Debug log
-
-    setCartItems((prev) => {
-      // Check if item already exists in cart
-      const existingItem = prev.find((item) => item.id === productId)
-
-      if (existingItem) {
-        // Update quantity if item exists
-        return prev.map((item) => (item.id === productId ? { ...item, quantity: item.quantity + 1 } : item))
-      } else {
-        // Add new item if it doesn't exist
-        const productToAdd = sampleProducts.find((p) => p.id === productId)
-        if (productToAdd) {
-          return [...prev, { ...productToAdd, quantity: 1 }]
-        }
-        return prev
-      }
-    })
-  }
-
-  const removeFromCart = (productId: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) => (item.id === productId && item.quantity > 0 ? { ...item, quantity: item.quantity - 1 } : item))
-        .filter((item) => item.quantity > 0),
-    )
-  }
+  const { cartItems, addToCart, removeFromCart } = useCart();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="border-b sticky top-0 bg-background z-50">
@@ -137,6 +67,5 @@ export default function Header() {
       {/* Offers Banner - below navigation */}
       <OffersBanner />
     </header>
-  )
+  );
 }
-
