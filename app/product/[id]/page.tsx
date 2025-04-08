@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import ProductDisplay from "./product-display";
+import { SVGCartLoader } from "@/components/loader/page"
 
 interface Product {
   id: number;
@@ -50,7 +51,11 @@ export default function ProductPage() {
       .catch(() => router.push("/404"));
   }, [params.id, router]);
 
-  if (!product) return <p>Cargando...</p>;
+  if (!product) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <SVGCartLoader />
+    </div>
+  )
 
   return <ProductDisplay product={product} />;
 }
