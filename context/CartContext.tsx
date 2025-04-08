@@ -16,7 +16,6 @@ interface CartContextType {
   removeFromCart: (productId: number) => void
 }
 
-
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
@@ -60,4 +59,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       {children}
     </CartContext.Provider>
   )
+}
+
+// ✅ Este hook es lo que falta para que tu import en hot-products-banner.tsx funcione
+export const useCart = () => {
+  const context = useContext(CartContext)
+  if (context === undefined) {
+    throw new Error("useCart debe usarse dentro de un CartProvider")
+  }
+  return context
 }
