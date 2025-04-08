@@ -46,7 +46,7 @@ export default function ProductGrid() {
 
   return (
     <>
-      <Header />
+      <Header products={products} addToCart={addToCart} />
       <HeroBanner />
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Lista de Productos</h1>
