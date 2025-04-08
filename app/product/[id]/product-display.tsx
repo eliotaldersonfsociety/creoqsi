@@ -72,7 +72,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
 
   return (
     <>
-    <Header products={products} addToCart={addToCart} />
+    <Header />
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-sm text-muted-foreground mb-6">
         <span className="hover:underline cursor-pointer">Home</span> /
