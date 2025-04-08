@@ -106,7 +106,9 @@ export default function ShoppingCart({
                   Close
                 </Button>
               </SheetClose>
-              <Button className="w-full">Checkout</Button>
+                <Link href="/checkout" passHref>
+                  <Button className="w-full">Checkout</Button>
+                </Link>
             </SheetFooter>
           </div>
         )}
