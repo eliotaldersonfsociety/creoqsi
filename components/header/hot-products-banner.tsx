@@ -13,16 +13,11 @@ interface Product {
   images: string[]
 }
 
-interface HotProductsBannerProps {
-  products: Product[]
-  addToCart: (productId: number) => void
-}
-
 function getRandomProducts<T>(array: T[], count: number): T[] {
   return array.sort(() => 0.5 - Math.random()).slice(0, count)
 }
 
-export default function HotProductsBanner({ products, addToCart }: HotProductsBannerProps) {
+export default function HotProductsBanner() {
   const [isOpen, setIsOpen] = useState(false)
 
   const hotProducts = getRandomProducts(products, 4)
