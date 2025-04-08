@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, HelpCircle, Info, Minus, Plus, X } from "lucide-react";
-import { useCart } from "@/context/cart-context";
+import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
