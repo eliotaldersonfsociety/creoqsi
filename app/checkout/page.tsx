@@ -67,7 +67,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                   <SelectValue placeholder="País / Región" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="colombia">Colombia</SelectItem>
+                  <SelectItem></SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -77,13 +77,13 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                 <Label htmlFor="firstname" className="sr-only">
                   Nombre
                 </Label>
-                <Input id="firstname" placeholder="Nombre" defaultValue="Silenny" />
+                <Input id="firstname" placeholder="Nombre" />
               </div>
               <div>
                 <Label htmlFor="lastname" className="sr-only">
                   Apellidos
                 </Label>
-                <Input id="lastname" placeholder="Apellidos" defaultValue="Latorre" />
+                <Input id="lastname" placeholder="Apellidos" />
               </div>
             </div>
 
@@ -91,7 +91,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
               <Label htmlFor="address" className="sr-only">
                 Dirección
               </Label>
-              <Input id="address" placeholder="Dirección" defaultValue="Calle 25 1179 Cucuta" />
+              <Input id="address" placeholder="Dirección" />
             </div>
 
             <div>
@@ -106,18 +106,18 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                 <Label htmlFor="city" className="sr-only">
                   Ciudad
                 </Label>
-                <Input id="city" placeholder="Ciudad" defaultValue="Cucuta" />
+                <Input id="city" placeholder="Ciudad" />
               </div>
               <div>
                 <Label htmlFor="province" className="sr-only">
                   Provincia / Estado
                 </Label>
-                <Select defaultValue="norte-de-santander">
+                <Select>
                   <SelectTrigger>
                     <SelectValue placeholder="Provincia / Estado" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="norte-de-santander">Norte de Santander</SelectItem>
+                    <SelectItem></SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -125,7 +125,7 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                 <Label htmlFor="postal" className="sr-only">
                   Código postal (opcional)
                 </Label>
-                <Input id="postal" placeholder="Código postal (opcional)" defaultValue="560005" />
+                <Input id="postal" placeholder="Código postal (opcional)" />
               </div>
             </div>
 
@@ -138,7 +138,6 @@ export default function CheckoutPage({ cartItems }: CheckoutPageProps) {
                   <Input
                     id="phone"
                     placeholder="Teléfono (opcional)"
-                    defaultValue="+57 300 6144416"
                     className="pl-16"
                   />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
