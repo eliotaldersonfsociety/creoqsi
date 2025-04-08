@@ -11,6 +11,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Header from "@/components/header/page";
 import Footer from "@/components/footer/page";
 
+interface HotProductsBannerProps {
+  addToCart: (product: Product) => void;
+  products: Product[];
+}
+
 interface Product {
   id: number;
   title: string;
