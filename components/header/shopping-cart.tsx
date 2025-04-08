@@ -42,7 +42,7 @@ export default function ShoppingCart({
         </Button>
       </SheetTrigger>
 
-      <SheetContent>
+      <SheetContent className="backdrop-blur-lg bg-background/80 p-4">
         <SheetHeader>
           <Image
             src="/tsn.png"
