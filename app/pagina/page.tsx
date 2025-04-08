@@ -38,6 +38,10 @@ export default function ProductGrid() {
       })
   }, [])
 
+  const addToCart = (productId: number) => {
+    console.log("🛒 Producto agregado al carrito:", productId)
+  }
+
   if (loading) return (
     <div className="flex justify-center items-center min-h-screen">
       <SVGCartLoader />
