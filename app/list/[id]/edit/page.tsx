@@ -35,10 +35,13 @@ export default function EditProduct() {
     }
   }, [id]);
 
-  if (loading) return (
+  if (loading) {
+    return (
     <div className="flex justify-center items-center min-h-screen">
       <SVGCartLoader />
     </div>
+    );
+  }
   if (!product) return <p>Producto no encontrado</p>;
 
   return (
