@@ -16,6 +16,11 @@ interface HotProductsBannerProps {
   products: Product[]
 }
 
+interface HeaderProps {
+  products: Product[]
+  addToCart: (productId: number) => void
+}
+
 function getRandomProducts<T>(array: T[], count: number): T[] {
   return array.sort(() => 0.5 - Math.random()).slice(0, count)
 }
