@@ -11,11 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Header from "@/components/header/page";
 import Footer from "@/components/footer/page";
 
-interface HotProductsBannerProps {
-  addToCart: (product: Product) => void;
-  products: Product[];
-}
-
 interface Product {
   id: number;
   title: string;
@@ -77,7 +72,7 @@ export default function ProductDisplay({ product }: { product: Product }) {
 
   return (
     <>
-    <Header />
+    <Header products={products} addToCart={addToCart} />
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="text-sm text-muted-foreground mb-6">
         <span className="hover:underline cursor-pointer">Home</span> /
