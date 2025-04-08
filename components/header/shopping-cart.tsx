@@ -1,4 +1,5 @@
-import { useCart } from "@/context/CartContext";
+"use client"
+
 import Image from "next/image";
 import { ShoppingCartIcon as CartIcon, Plus, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +13,15 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet";
+import type { CartItem } from "@/components/header/page";
 
-export default function ShoppingCart() {
-  const { cartItems, addToCart, removeFromCart } = useCart();
+interface ShoppingCartProps {
+  cartItems: CartItem[];
+  addToCart: (product: CartItem) => void;
+  removeFromCart: (productId: number) => void;
+}
 
+export default function ShoppingCart({ cartItems, addToCart, removeFromCart }: ShoppingCartProps) {
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
