@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { ChevronDown, Flame } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useCart } from "@/context/cart-context" // asegúrate que este path sea correcto
 
 interface Product {
   id: number
@@ -19,6 +20,22 @@ function getRandomProducts<T>(array: T[], count: number): T[] {
 
 export default function HotProductsBanner() {
   const [isOpen, setIsOpen] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const { addToCart } = useCart()
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products") // cambia si tu endpoint es distinto
+        const data = await res.json()
+        setProducts(data)
+      } catch (err) {
+        console.error("Error al cargar productos:", err)
+      }
+    }
+
+    fetchProducts()
+  }, [])
 
   const hotProducts = getRandomProducts(products, 4)
 
@@ -31,9 +48,7 @@ export default function HotProductsBanner() {
         <Flame className="h-4 w-4 mr-2 text-orange-500" />
         Lo más hot
         <ChevronDown
-          className={`h-4 w-4 ml-2 transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`h-4 w-4 ml-2 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -59,9 +74,7 @@ export default function HotProductsBanner() {
                     height={120}
                     className="w-full h-auto object-cover rounded-md"
                   />
-                  <Badge className="absolute top-2 right-2 bg-orange-500">
-                    Hot
-                  </Badge>
+                  <Badge className="absolute top-2 right-2 bg-orange-500">Hot</Badge>
                 </div>
                 <h3 className="font-medium text-sm mb-1">{product.title}</h3>
                 <div className="flex items-center justify-between mt-auto">
