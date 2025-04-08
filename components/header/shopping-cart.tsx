@@ -45,7 +45,7 @@ export default function ShoppingCart({
       <SheetContent>
         <SheetHeader>
           <Image
-            src="/tsn.png
+            src="/tsn.png"
             alt="Carrito"
             width={120}
             height={40}
