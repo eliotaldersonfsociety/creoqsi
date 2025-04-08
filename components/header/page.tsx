@@ -90,7 +90,7 @@ export default function Header() {
   return (
     <header className="border-b sticky top-0 bg-background z-50">
       {/* Hot Products Banner - above everything */}
-      <HotProductsBanner products={sampleProducts} addToCart={addToCart} />
+      <HotProductsBanner />
 
       <div className="container mx-auto px-4">
         {/* Top header with logo, search bar and user controls */}
