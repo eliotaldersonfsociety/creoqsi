@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import Header from "@/components/header/page"
 import HeroBanner from "@/components/hero/page"
+import { SVGCartLoader } from "@/components/loader/page"
 
 interface Product {
   id: number
@@ -37,7 +38,11 @@ export default function ProductGrid() {
       })
   }, [])
 
-  if (loading) return <p className="text-center py-10">Cargando productos...</p>
+  if (loading) return (
+    <div className="flex justify-center items-center min-h-screen">
+      <SVGCartLoader />
+    </div>
+  )
 
   return (
     <>
