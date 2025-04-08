@@ -5,7 +5,7 @@ import Image from "next/image"
 import { ChevronDown, Flame } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useCart } from "@/context/cart-context" // asegúrate que este path sea correcto
+import { useCart } from "@/context/CartContext" // asegúrate que este path sea correcto
 
 interface Product {
   id: number
