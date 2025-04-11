@@ -22,7 +22,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left side - Checkout form */}
+      {/* Left side - Checsskout form */}
       <div className="flex-1 p-4 md:p-8 bg-white">
         <div className="max-w-xl mx-auto">
           <h2 className="text-xl font-bold mb-4">Contacto</h2>
