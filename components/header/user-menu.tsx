@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useSession, signIn, signOut } from "next-auth/react"
-import { User } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import Link from "next/link";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { User } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,35 +12,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function UserMenu() {
-  const { data: session } = useSession()
-  const isLoggedIn = !!session?.user
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     const res = await signIn("credentials", {
       redirect: false,
       email,
       password,
-    })
+    });
 
-    setLoading(false)
+    setLoading(false);
 
     if (res?.error) {
-      setError("Credenciales incorrectas")
+      setError("Credenciales incorrectas");
     }
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -53,16 +53,18 @@ export default function UserMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        {isLoggedIn ? (
+        {isLoggedIn && session?.user ? (
           <>
             <DropdownMenuLabel>
               <div className="flex items-center gap-2">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={session.user.image || ""} />
-                  <AvatarFallback>{session.user.name?.charAt(0)}</AvatarFallback>
+                  <AvatarImage src={session.user.image ?? ""} />
+                  <AvatarFallback>
+                    {session.user.name?.charAt(0) ?? "U"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span>{session.user.name}</span>
+                  <span>{session.user.name ?? "Usuario"}</span>
                   <span className="text-xs text-green-500 font-normal">Online</span>
                 </div>
               </div>
@@ -109,5 +111,5 @@ export default function UserMenu() {
         )}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
