@@ -1,9 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db from "@/lib/db";
-import type NextAuthConfig from "next-auth";
+import { db } from "@/lib/db";
 
-const authOptions: NextAuthConfig = {
+const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -28,7 +27,7 @@ const authOptions: NextAuthConfig = {
         const user = rows[0];
 
         return {
-          id: user.id,
+          id: String(user.id),
           name: user.name,
           lastname: user.lastname,
           email: user.email,
