@@ -1,5 +1,6 @@
 "use client";
-
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ShoppingCartIcon as CartIcon, Plus, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,8 @@ export default function ShoppingCart({
   addToCart,
   removeFromCart,
 }: ShoppingCartProps) {
+  const { data: session } = useSession();
+  const router = useRouter();
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return (
@@ -114,9 +117,19 @@ export default function ShoppingCart({
                   Close
                 </Button>
               </SheetClose>
-                <Link href="/checkout" passHref>
-                  <Button className="w-full">Checkout</Button>
-                </Link>
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    if (session) {
+                      router.push("/payu");
+                    } else {
+                      router.push("/checkout");
+                    }
+                  }}
+                >
+                  Checkout
+                </Button>
+
             </SheetFooter>
           </div>
         )}
