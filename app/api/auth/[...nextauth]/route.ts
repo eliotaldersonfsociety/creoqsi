@@ -20,7 +20,7 @@ interface CustomUser extends NextAuthUser {
 
 // Extend the Session type to include the custom user properties
 interface CustomSession extends Session {
-  user?: {
+  user: {
     id: string;
     name: string;
     lastname: string;
@@ -31,7 +31,7 @@ interface CustomSession extends Session {
     city: string;
     state: string;
     postal_code: string;
-  }
+  } & Session['user'];
 }
 
 interface CustomJWT extends JWT {
@@ -122,19 +122,20 @@ const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: CustomSession; token: JWT }): Promise<CustomSession> {
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       // Map the token properties to the session.user object
       session.user = {
-        id: token.id as string,
-        name: token.name as string,
-        lastname: token.lastname as string,
-        email: token.email as string,
-        phone: token.phone as string,
-        address: token.address as string,
-        house_apt: token.house_apt as string,
-        city: token.city as string,
-        state: token.state as string,
-        postal_code: token.postal_code as string,
+        ...session.user,
+        id: token.id,
+        name: token.name,
+        lastname: token.lastname,
+        email: token.email,
+        phone: token.phone,
+        address: token.address,
+        house_apt: token.house_apt,
+        city: token.city,
+        state: token.state,
+        postal_code: token.postal_code,
       };
       return session;
     },
