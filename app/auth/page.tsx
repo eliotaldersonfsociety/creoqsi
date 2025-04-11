@@ -1,7 +1,8 @@
 //@/app/auth/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,9 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState("login");
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,7 +41,12 @@ export default function AuthPage() {
     if (result?.error) {
       setError(result.error);
     } else {
-      window.location.href = "/dashboard"; // redirección automática
+      const fromCheckout = searchParams.get("from") === "checkout";
+      if (fromCheckout) {
+        router.push("/payu");
+      } else {
+        router.push("/dashboard");
+      }
     }
   };
 
