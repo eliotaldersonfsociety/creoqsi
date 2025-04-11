@@ -13,6 +13,7 @@ declare module 'next-auth' {
       city: string;
       state: string;
       postal_code: string;
+      image?: string;
     };
   }
 
