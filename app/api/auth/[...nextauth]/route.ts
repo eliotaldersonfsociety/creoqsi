@@ -1,7 +1,7 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import db from "@/lib/db";
+import NextAuth from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs"
+import db from "@/lib/db"
 
 const handler = NextAuth({
   providers: [
@@ -11,27 +11,21 @@ const handler = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials, req) => {
-        const { email, password } = credentials ?? {};
+      async authorize(credentials, req) {
+        const { email, password } = credentials ?? {}
 
-        if (!email || !password) {
-          throw new Error("Faltan credenciales");
-        }
+        if (!email || !password) return null
 
         const result = await db.execute({
           sql: "SELECT * FROM users WHERE email = ?",
           args: [email],
-        });
+        })
 
-        const user = result.rows[0];
-        if (!user || !user.password) {
-          throw new Error("Usuario no encontrado");
-        }
+        const user = result.rows[0]
+        if (!user || !user.password) return null
 
-        const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) {
-          throw new Error("Contraseña inválida");
-        }
+        const isValid = await bcrypt.compare(password, user.password)
+        if (!isValid) return null
 
         return {
           id: user.id,
@@ -44,7 +38,7 @@ const handler = NextAuth({
           city: user.city,
           state: user.state,
           postal_code: user.postal_code,
-        };
+        }
       },
     }),
   ],
@@ -54,18 +48,18 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.lastname = user.lastname;
-        token.phone = user.phone;
-        token.address = user.address;
-        token.house_apt = user.house_apt;
-        token.city = user.city;
-        token.state = user.state;
-        token.postal_code = user.postal_code;
+        token.id = user.id
+        token.name = user.name
+        token.email = user.email
+        token.lastname = user.lastname
+        token.phone = user.phone
+        token.address = user.address
+        token.house_apt = user.house_apt
+        token.city = user.city
+        token.state = user.state
+        token.postal_code = user.postal_code
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       session.user = {
@@ -79,14 +73,14 @@ const handler = NextAuth({
         city: token.city,
         state: token.state,
         postal_code: token.postal_code,
-      };
-      return session;
+      }
+      return session
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
   },
-});
+})
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }
