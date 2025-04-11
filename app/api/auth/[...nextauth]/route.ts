@@ -27,17 +27,18 @@ const handler = NextAuth({
         const isValid = await bcrypt.compare(password, user.password)
         if (!isValid) return null
 
+        // Aseguramos que todo sea string (o undefined, que es aceptado)
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          lastname: user.lastname,
-          phone: user.phone,
-          address: user.address,
-          house_apt: user.house_apt,
-          city: user.city,
-          state: user.state,
-          postal_code: user.postal_code,
+          id: String(user.id ?? ""),
+          name: String(user.name ?? ""),
+          email: String(user.email ?? ""),
+          lastname: String(user.lastname ?? ""),
+          phone: String(user.phone ?? ""),
+          address: String(user.address ?? ""),
+          house_apt: String(user.house_apt ?? ""),
+          city: String(user.city ?? ""),
+          state: String(user.state ?? ""),
+          postal_code: String(user.postal_code ?? ""),
         }
       },
     }),
