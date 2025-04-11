@@ -4,6 +4,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import db from '@/lib/db'; // Ensure this is your database connection
 
+// Extend the User type to include additional properties
 interface CustomUser extends NextAuthUser {
   id: string;
   name: string;
@@ -17,8 +18,20 @@ interface CustomUser extends NextAuthUser {
   postal_code: string;
 }
 
+// Extend the Session type to include the custom user properties
 interface CustomSession extends Session {
-  user: CustomUser;
+  user?: {
+    id: string;
+    name: string;
+    lastname: string;
+    email: string;
+    phone: string;
+    address: string;
+    house_apt: string;
+    city: string;
+    state: string;
+    postal_code: string;
+  }
 }
 
 interface CustomJWT extends JWT {
@@ -109,20 +122,19 @@ const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+    async session({ session, token }: { session: CustomSession; token: JWT }): Promise<CustomSession> {
       // Map the token properties to the session.user object
       session.user = {
-        ...session.user,
-        id: token.id,
-        name: token.name,
-        lastname: token.lastname,
-        email: token.email,
-        phone: token.phone,
-        address: token.address,
-        house_apt: token.house_apt,
-        city: token.city,
-        state: token.state,
-        postal_code: token.postal_code,
+        id: token.id as string,
+        name: token.name as string,
+        lastname: token.lastname as string,
+        email: token.email as string,
+        phone: token.phone as string,
+        address: token.address as string,
+        house_apt: token.house_apt as string,
+        city: token.city as string,
+        state: token.state as string,
+        postal_code: token.postal_code as string,
       };
       return session;
     },
