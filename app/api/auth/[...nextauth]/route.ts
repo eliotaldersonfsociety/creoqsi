@@ -1,8 +1,11 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
+import { NextAuthOptions } from "next-auth";
+import { JWT } from "next-auth/jwt";
+import { Session } from "next-auth";
 
-const authOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -44,20 +47,32 @@ const authOptions = {
   pages: {
     signIn: "/auth/login",
   },
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({
+      token,
+      user,
+    }: {
+      token: JWT;
+      user?: Record<string, unknown>;
+    }): Promise<JWT> {
       if (user) {
         return { ...token, ...user };
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({
+      session,
+      token,
+    }: {
+      session: Session;
+      token: JWT;
+    }): Promise<Session> {
       session.user = token as any;
       return session;
     },
-  },
-  session: {
-    strategy: "jwt",
   },
 };
 
