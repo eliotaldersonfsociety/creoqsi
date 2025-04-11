@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions, User, Session } from 'next-auth';
+import NextAuth, { NextAuthOptions, User, Session, Account, Profile } from 'next-auth';
 import { JWT } from 'next-auth/jwt'; // Correct import for JWT type
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
@@ -94,23 +94,36 @@ const authOptions: NextAuthOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }: { token: CustomJWT; user?: CustomUser }) {
+    async jwt({ token, user }: { token: JWT; user?: User | undefined }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
-        token.lastname = user.lastname;
+        token.lastname = (user as CustomUser).lastname;
         token.email = user.email;
-        token.phone = user.phone;
-        token.address = user.address;
-        token.house_apt = user.house_apt;
-        token.city = user.city;
-        token.state = user.state;
-        token.postal_code = user.postal_code;
+        token.phone = (user as CustomUser).phone;
+        token.address = (user as CustomUser).address;
+        token.house_apt = (user as CustomUser).house_apt;
+        token.city = (user as CustomUser).city;
+        token.state = (user as CustomUser).state;
+        token.postal_code = (user as CustomUser).postal_code;
       }
       return token;
     },
-    async session({ session, token }: { session: CustomSession; token: CustomJWT }) {
-      session.user = token as CustomUser;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      const customUser = token as CustomUser;
+      session.user = {
+        ...session.user,
+        id: customUser.id,
+        name: customUser.name,
+        lastname: customUser.lastname,
+        email: customUser.email,
+        phone: customUser.phone,
+        address: customUser.address,
+        house_apt: customUser.house_apt,
+        city: customUser.city,
+        state: customUser.state,
+        postal_code: customUser.postal_code,
+      };
       return session;
     },
   },
