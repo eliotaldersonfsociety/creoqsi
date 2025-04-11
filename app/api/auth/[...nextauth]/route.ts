@@ -1,10 +1,9 @@
-// @/app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import db from "@/lib/db";
 
-export const authOptions = {
+const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -51,6 +50,7 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt",
+    maxAge: 60 * 60 * 24 * 7, // 7 días
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -88,7 +88,6 @@ export const authOptions = {
   pages: {
     signIn: "/login",
   },
-};
+});
 
-const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
