@@ -1,14 +1,14 @@
 import NextAuth from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
-import db from "@/lib/db"
+import { db } from "@/lib/db"
 
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
@@ -21,24 +21,24 @@ const handler = NextAuth({
           args: [email],
         })
 
-        const user = result.rows[0]
-        if (!user || !user.password) return null
+        const row = result.rows[0]
+        if (!row || !row.password?.value) return null
 
-        const isValid = await bcrypt.compare(password, user.password)
+        const isValid = await bcrypt.compare(password, row.password.value)
         if (!isValid) return null
 
-        // Aseguramos que todo sea string (o undefined, que es aceptado)
+        // NextAuth espera que id sea string
         return {
-          id: String(user.id ?? ""),
-          name: String(user.name ?? ""),
-          email: String(user.email ?? ""),
-          lastname: String(user.lastname ?? ""),
-          phone: String(user.phone ?? ""),
-          address: String(user.address ?? ""),
-          house_apt: String(user.house_apt ?? ""),
-          city: String(user.city ?? ""),
-          state: String(user.state ?? ""),
-          postal_code: String(user.postal_code ?? ""),
+          id: row.id?.value ?? "",
+          name: row.name?.value ?? "",
+          email: row.email?.value ?? "",
+          lastname: row.lastname?.value ?? "",
+          phone: row.phone?.value ?? "",
+          address: row.address?.value ?? "",
+          house_apt: row.house_apt?.value ?? "",
+          city: row.city?.value ?? "",
+          state: row.state?.value ?? "",
+          postal_code: row.postal_code?.value ?? "",
         }
       },
     }),
@@ -46,42 +46,46 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
+  pages: {
+    signIn: "/auth/login",
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id
-        token.name = user.name
-        token.email = user.email
-        token.lastname = user.lastname
-        token.phone = user.phone
-        token.address = user.address
-        token.house_apt = user.house_apt
-        token.city = user.city
-        token.state = user.state
-        token.postal_code = user.postal_code
+        return {
+          ...token,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          lastname: user.lastname,
+          phone: user.phone,
+          address: user.address,
+          house_apt: user.house_apt,
+          city: user.city,
+          state: user.state,
+          postal_code: user.postal_code,
+        }
       }
       return token
     },
     async session({ session, token }) {
-      session.user = {
-        id: token.id,
-        name: token.name,
-        email: token.email,
-        lastname: token.lastname,
-        phone: token.phone,
-        address: token.address,
-        house_apt: token.house_apt,
-        city: token.city,
-        state: token.state,
-        postal_code: token.postal_code,
+      if (token) {
+        session.user = {
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          lastname: token.lastname,
+          phone: token.phone,
+          address: token.address,
+          house_apt: token.house_apt,
+          city: token.city,
+          state: token.state,
+          postal_code: token.postal_code,
+        }
       }
       return session
     },
   },
-  pages: {
-    signIn: "/login",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
 })
 
 export { handler as GET, handler as POST }
