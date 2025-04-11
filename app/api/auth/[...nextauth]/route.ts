@@ -1,4 +1,4 @@
-import NextAuth, { NextAuthOptions, User as NextAuthUser, Session } from 'next-auth';
+import NextAuth, { NextAuthOptions, User as NextAuthUser, Session, DefaultSession } from 'next-auth';
 import { JWT } from 'next-auth/jwt'; // Correct import for JWT type
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
@@ -109,19 +109,20 @@ const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: CustomSession; token: JWT }) {
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       // Map the token properties to the session.user object
       session.user = {
-        id: token.id as string,
-        name: token.name as string,
-        lastname: token.lastname as string,
-        email: token.email as string,
-        phone: token.phone as string,
-        address: token.address as string,
-        house_apt: token.house_apt as string,
-        city: token.city as string,
-        state: token.state as string,
-        postal_code: token.postal_code as string,
+        ...session.user,
+        id: token.id,
+        name: token.name,
+        lastname: token.lastname,
+        email: token.email,
+        phone: token.phone,
+        address: token.address,
+        house_apt: token.house_apt,
+        city: token.city,
+        state: token.state,
+        postal_code: token.postal_code,
       };
       return session;
     },
