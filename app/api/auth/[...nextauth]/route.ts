@@ -11,7 +11,7 @@ const handler = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      authorize: async (credentials) => {
         const { email, password } = credentials ?? {}
 
         if (!email || !password) return null
@@ -77,10 +77,10 @@ const handler = NextAuth({
       return session
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
   },
+  secret: process.env.NEXTAUTH_SECRET,
 })
 
 export { handler as GET, handler as POST }
