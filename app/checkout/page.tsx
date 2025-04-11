@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link"
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, HelpCircle, Info, Minus, Plus, X } from "lucide-react";
@@ -28,9 +28,9 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-bold mb-4">Contacto</h2>
           <div className="flex justify-between items-center mb-4">
             <div></div>
-            <a href="/auth" className="text-blue-600 text-sm">
+            <Link href="/auth" className="text-blue-600 text-sm">
               Iniciar sesión
-            </a>
+            </Link>
           </div>
 
           <div className="mb-6">
