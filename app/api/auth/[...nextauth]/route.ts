@@ -110,19 +110,17 @@ const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }: { session: Session; token: JWT }) {
-      const customUser = token as CustomUser;
       session.user = {
-        ...session.user,
-        id: customUser.id,
-        name: customUser.name,
-        lastname: customUser.lastname,
-        email: customUser.email,
-        phone: customUser.phone,
-        address: customUser.address,
-        house_apt: customUser.house_apt,
-        city: customUser.city,
-        state: customUser.state,
-        postal_code: customUser.postal_code,
+        id: token.id,
+        name: token.name,
+        lastname: token.lastname,
+        email: token.email,
+        phone: token.phone,
+        address: token.address,
+        house_apt: token.house_apt,
+        city: token.city,
+        state: token.state,
+        postal_code: token.postal_code,
       };
       return session;
     },
