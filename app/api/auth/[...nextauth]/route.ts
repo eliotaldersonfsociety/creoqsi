@@ -1,4 +1,5 @@
-import NextAuth, { NextAuthOptions, User, Session, JWT } from 'next-auth';
+import NextAuth, { NextAuthOptions, User, Session } from 'next-auth';
+import { JWT } from 'next-auth/jwt'; // Correct import for JWT type
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import db from '@/lib/db'; // Ensure this is your database connection
