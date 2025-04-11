@@ -70,7 +70,10 @@ export default function Header() {
           <SearchBar />
         </div>
 
-        <NavigationMenu mobileMenuOpen={mobileMenuOpen} isLoggedIn={isLoggedIn} />
+        <NavigationMenu
+          mobileMenuOpen={mobileMenuOpen}
+          isLoggedIn={isLoggedIn}
+        />
       </div>
 
       <OffersBanner />
