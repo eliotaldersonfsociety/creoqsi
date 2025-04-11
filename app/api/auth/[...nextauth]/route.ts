@@ -1,9 +1,39 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions, User, Session, JWT } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcrypt';
 import db from '@/lib/db'; // Ensure this is your database connection
 
-const authOptions = {
+interface CustomUser extends User {
+  id: string;
+  name: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  address: string;
+  house_apt: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+interface CustomSession extends Session {
+  user: CustomUser;
+}
+
+interface CustomJWT extends JWT {
+  id: string;
+  name: string;
+  lastname: string;
+  email: string;
+  phone: string;
+  address: string;
+  house_apt: string;
+  city: string;
+  state: string;
+  postal_code: string;
+}
+
+const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -45,7 +75,7 @@ const authOptions = {
               city: user.city,
               state: user.state,
               postal_code: user.postal_code,
-            };
+            } as CustomUser;
           } else {
             return null;
           }
@@ -63,14 +93,23 @@ const authOptions = {
     strategy: 'jwt',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: CustomJWT; user?: CustomUser }) {
       if (user) {
-        return { ...token, ...user };
+        token.id = user.id;
+        token.name = user.name;
+        token.lastname = user.lastname;
+        token.email = user.email;
+        token.phone = user.phone;
+        token.address = user.address;
+        token.house_apt = user.house_apt;
+        token.city = user.city;
+        token.state = user.state;
+        token.postal_code = user.postal_code;
       }
       return token;
     },
-    async session({ session, token }) {
-      session.user = token as any;
+    async session({ session, token }: { session: CustomSession; token: CustomJWT }) {
+      session.user = token as CustomUser;
       return session;
     },
   },
